@@ -21,7 +21,35 @@
     <body>
         <div id="objectLayer">
             <div id = "objects">
-     
+                <div class="object room" style="left:400px;top:400px;" lbase=400 tbase=400>
+                    <div class="objBar">
+                        <div class="grabBar">
+                            
+                        </div>
+                        <div class="objX">x</div>
+                    </div>
+                    <div class="handles">
+                        <div class="link westLink">
+                            <div class = "circle"></div>
+                            <div class = "tri"></div>
+                        </div>
+                        <div class="link eastLink">
+                            <div class = "circle"></div>
+                            <div class = "tri"></div>
+                        </div>
+                        <div class="link northLink">
+                            <div class = "circle"></div>
+                            <div class = "tri"></div>
+                        </div>
+                        <div class="link southLink">
+                            <div class = "circle"></div>
+                            <div class = "tri"></div>
+                        </div>
+                    </div>
+                    <div class="body">
+                        
+                    </div>
+                </div>
             </div>
             <div id = "tools">
                 <div id = "compass"></div>
@@ -29,11 +57,6 @@
                 <div id = "zoomMinus" tooltip = "[Mousewheel Down] Zoom Out"></div>
                 <div id = "layerMenu">
                     <div class = "layer active"></div>
-                    <div class = "layer"></div>
-                    <div class = "layer"></div>
-                    <div class = "layer"></div>
-                    <div class = "layer"></div>
-                    <div class = "layer"></div>
                     <div class = "layer"></div>
                     <div class = "layer"></div>
                     <div class = "layer"></div>
@@ -90,12 +113,12 @@
                     <div class="label">Tools</div>
                     <div class="contextSubMenu active" id="rooms">
                         <div class="menuItem active" id="move" tooltip="[M] Move and Delete Rooms" shortcut = "m">M</div>
-                        <div class="menuItem" id="add" tooltip="[A] Add Rooms" shortcut = "a">+</div>
-                        <div class="menuItem" id="connection" tooltip="[C] Select and edit room connections, doors, locks, etc.">C</div>
-                        <div class="menuItem" id="description" tooltip="[D] Edit a room&#39;s description, name, and other settings">D</div>
-                        <div class="menuItem" id="zoomextents" tooltip="[Z] Zoom window to show all rooms (on this level)">Z</div>
-                        <div class="menuItem" id="align" tooltip="[A] Align all rooms in this window in a grid based on connections">A</div>
-                        <div class="menuItem" id="list" tooltip="[L] Switch to list view">L</div>
+                        <div class="menuItem" id="add" tooltip="[A] Add Rooms" shortcut = "a">A</div>
+                        <div class="menuItem" id="connection" tooltip="[C] Select and edit room connections, doors, locks, etc." shortcut="c" >C</div>
+                        <div class="menuItem" id="description" tooltip="[D] Edit a room&#39;s description, name, and other settings" shortcut="d" >D</div>
+                        <div class="menuItem" id="zoomextents" tooltip="[Z] Zoom window to show all rooms (on this level)" shortcut="z">Z</div>
+                        <div class="menuItem" id="align" tooltip="[E] Align all rooms in this window in a grid based on connections" shortcut="e" >E</div>
+                        <div class="menuItem" id="list" tooltip="[L] Switch to list view" shortcut = "l">L</div>
                     </div>
                     <div class="contextSubMenu" id="objects">
                         <div class="menuItem active" id="add" tooltip="[A] Add Rooms">+</div>

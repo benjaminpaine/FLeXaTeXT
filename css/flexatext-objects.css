@@ -236,3 +236,123 @@ div#objectLayer > div#objects > div.object > div.objBar > div.objX:active
     color: black;
     background-color: rgba(255,255,255,0.2);
 }
+
+div#objectLayer > div#objects > div.object > div.handles > div.link > div.circle
+{
+    position: absolute;
+    width: 25px;
+    height: 25px;
+    background: radial-gradient( circle, rgba(158,160,149,0.3) 40%, #9EA095 45%, #9EA095 55%, transparent 60%);
+}
+
+div#objectLayer > div#objects > div.object > div.handles > div.link > div.tri
+{
+    position: absolute;
+    width: 25px;
+    height: 25px;
+ 
+}
+
+div#objectLayer > div#objects > div.object > div.handles > div.link.westLink
+{
+    position: absolute;
+    width: 25px;
+    height: 5px;
+    top: 50%;
+    margin-top:-2.5px;
+    left: -25px;
+    cursor: pointer;
+}
+
+div#objectLayer > div#objects > div.object > div.handles > div.link.westLink > div.circle
+{
+    left: -10px;
+    top: -10px;
+}
+
+div#objectLayer > div#objects > div.object > div.handles > div.link.westLink > div.tri
+{
+    top: -12.5px;
+    right: 0px;
+    border-right: 15px solid #9EA095;
+    border-top: 15px solid transparent;
+    border-bottom: 15px solid transparent;
+}
+
+div#objectLayer > div#objects > div.object > div.handles > div.link.eastLink
+{
+    position: absolute;
+    width: 25px;
+    height: 5px;
+    top: 50%;
+    margin-top:-2.5px;
+    right: -25px;
+    cursor: pointer;
+}
+
+div#objectLayer > div#objects > div.object > div.handles > div.link.eastLink > div.circle
+{
+    right: -11px;
+    top: -10px;
+}
+
+div#objectLayer > div#objects > div.object > div.handles > div.link.eastLink > div.tri
+{
+    top: -12.5px;
+    right: 0px;
+    border-left: 15px solid #9EA095;
+    border-top: 15px solid transparent;
+    border-bottom: 15px solid transparent;
+}
+
+div#objectLayer > div#objects > div.object > div.handles > div.link.northLink
+{
+    position: absolute;
+    width: 5px;
+    height: 25px;
+    left: 50%;
+    margin-left:-2.5px;
+    top: -25px;
+    cursor: pointer;
+}
+
+div#objectLayer > div#objects > div.object > div.handles > div.link.northLink > div.circle
+{
+    right: -11px;
+    top: -10px;
+}
+
+div#objectLayer > div#objects > div.object > div.handles > div.link.northLink > div.tri
+{
+    top: 0px;
+    right: -12.5px;
+    border-bottom: 15px solid #9EA095;
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+}
+
+div#objectLayer > div#objects > div.object > div.handles > div.link.southLink
+{
+    position: absolute;
+    width: 5px;
+    height: 25px;
+    left: 50%;
+    margin-left:-2.5px;
+    bottom: -25px;
+    cursor: pointer;
+}
+
+div#objectLayer > div#objects > div.object > div.handles > div.link.southLink > div.circle
+{
+    right: -11px;
+    bottom: -11px;
+}
+
+div#objectLayer > div#objects > div.object > div.handles > div.link.southLink > div.tri
+{
+    bottom: 0px;
+    right: -13px;
+    border-top: 15px solid #9EA095;
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+}
