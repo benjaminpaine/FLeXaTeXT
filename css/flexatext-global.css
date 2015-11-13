@@ -1,0 +1,43 @@
+div
+{
+           box-sizing: border-box;
+    webkit-box-sizing: border-box;
+    font-family: "Raleway",sans-serif;
+}
+
+div#toolTip
+{
+    display: block;
+    position: fixed;
+    max-width: 400px;
+    padding: 10px;
+    background: rgba(0,0,0,0.8);
+    color: white;
+    min-width: 50px;
+    min-height: 30px;
+    text-align: center;
+    z-index: 10;
+    border-radius: 7px;
+}
+
+h1
+{
+    font-size: 42px;
+    font-weight: 900;
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+h2
+{
+    font-size: 34px;
+    text-transform: uppercase;
+    font-weight: 600;
+    border-bottom: 2px solid rgba(0,0,0,0.4);
+    margin-bottom: 10px;
+}
+
+h3
+{
+    font-size: 28px;
+}

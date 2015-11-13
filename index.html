@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+        <link href="https://fonts.googleapis.com/css?family=Raleway:200,400,600,900" rel="stylesheet" type="text/css" />
+        <link href="css/flexatext-reset.css" rel="stylesheet" type="text/css">
+        <link href="css/flexatext-global.css" rel="stylesheet" type="text/css">
+        <link href="css/flexatext-objects.css" rel="stylesheet" type="text/css">
+        <link href="css/flexatext-menus.css" rel="stylesheet" type="text/css">
+        <link href="css/flexatext-alerts.css" rel="stylesheet" type="text/css">
+        <script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
+        <script type="text/javascript" src="js/jquery.mousewheel.min.js"></script>
+        <script type="text/javascript" src="js/flexatext-global.js"></script>
+        <script type="text/javascript" src="js/flexatext-oop.js"></script>
+        <script type="text/javascript" src="js/flexatext-object-manip.js"></script>
+        <script type="text/javascript" src="js/flexatext-menus.js"></script>
+        <script type="text/javascript" src="js/flexatext-tooltips.js"></script>
+        <script type="text/javascript" src="js/flexatext-shortcuts.js"></script>
+        <script type="text/javascript" src="js/flexatext-alerts.js"></script>
+    </head>
+    <body>
+        <div id="objectLayer">
+            <div id = "objects">
+     
+            </div>
+            <div id = "tools">
+                <div id = "compass"></div>
+                <div id = "zoomPlus" tooltip = "[Mousewheel Up] Zoom In"></div>
+                <div id = "zoomMinus" tooltip = "[Mousewheel Down] Zoom Out"></div>
+                <div id = "layerMenu">
+                    <div class = "layer active"></div>
+                    <div class = "layer"></div>
+                    <div class = "layer"></div>
+                    <div class = "layer"></div>
+                    <div class = "layer"></div>
+                    <div class = "layer"></div>
+                    <div class = "layer"></div>
+                    <div class = "layer"></div>
+                    <div class = "layer"></div>
+                </div>
+            </div>
+        </div>
+        <div id="menuLayer">
+            <div id="headMenu">
+                <div class="menuItem">
+                    File
+                    <div class="pulldownMenu" style="display: none;">
+                        <div class="pulldownItem" tooltip="Clear all objects, room, and settings.">
+                            New <span class="keyboardShortcut"><span class="ctrl">Ctrl+</span>N</span>
+                        </div>
+                        <div class="pulldownItem" tooltip="Choose a file on the server to work on.">
+                            Open <span class="keyboardShortcut"><span class="ctrl">Ctrl+</span>O</span>
+                        </div>
+                        <div class="pulldownItem" tooltip="Save your file.">
+                            Save <span class="keyboardShortcut"><span class="ctrl">Ctrl+</span>S</span>
+                        </div>
+                        <div class="pulldownItem" tooltip="Upload a saved .json file from your computer." style="border-top: 3px solid #9EA095;">
+                            Upload <span class="keyboardShortcut"><span class="ctrl">Ctrl+</span>U</span>
+                        </div>
+                        <div class="pulldownItem" tooltip="Download this projects .json file to your computer.">
+                            Download <span class="keyboardShortcut"><span class="ctrl">Ctrl+</span>D</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="menuItem">Edit</div>
+                <div class="menuItem">Window</div>
+                <div class="menuItem">Settings</div>
+                <div class="menuItem">Help</div>
+                <div id="logo">FLeXaTeXT</div>
+            </div>
+            <div id="leftMenu">
+                <div id="layerMenu">
+                    <div class="label">Mode</div>
+                    <div class="menuItem active" id="rooms" tooltip="Rooms"></div>
+                    <div class="menuItem" id="objects" tooltip="Objects"></div>
+                    <div class="menuItem" id="events" tooltip="Events"></div>
+                    <div class="menuItem" id="presentation" tooltip="Presentation"></div>
+                    <div class="menuItem" id="preview" tooltip="Preview"></div>
+                </div>
+                <div id="contextMenu">
+                    <div class="label">Tools</div>
+                    <div class="contextSubMenu active" id="rooms">
+                        <div class="menuItem active" id="move" tooltip="[M] Move and Delete Rooms">M</div>
+                        <div class="menuItem" id="add" tooltip="[A] Add Rooms">+</div>
+                        <div class="menuItem" id="connection" tooltip="[C] Select and edit room connections, doors, locks, etc.">C</div>
+                        <div class="menuItem" id="description" tooltip="[D] Edit a room&#39;s description, name, and other settings">D</div>
+                        <div class="menuItem" id="zoomextents" tooltip="[Z] Zoom window to show all rooms (on this level)">Z</div>
+                        <div class="menuItem" id="align" tooltip="[A] Align all rooms in this window in a grid based on connections">A</div>
+                        <div class="menuItem" id="list" tooltip="[L] Switch to list view">L</div>
+                    </div>
+                    <div class="contextSubMenu" id="objects">
+                        <div class="menuItem active" id="add" tooltip="[A] Add Rooms">+</div>
+                        <div class="menuItem" id="move" tooltip="[M] Move Rooms">M</div>
+                    </div>
+                    <div class="contextSubMenu" id="events">
+                        <div class="menuItem active" id="add" tooltip="[A] Add Rooms">+</div>
+                        <div class="menuItem" id="move" tooltip="[M] Move Rooms">M</div>
+                    </div>
+                    <div class="contextSubMenu" id="presentation">
+                        <div class="menuItem active" id="add" tooltip="[A] Add Rooms">+</div>
+                        <div class="menuItem" id="move" tooltip="[M] Move Rooms">M</div>
+                    </div>
+                    <div class="contextSubMenu" id="preview">
+                        <div class="menuItem active" id="add" tooltip="[A] Add Rooms">+</div>
+                        <div class="menuItem" id="move" tooltip="[M] Move Rooms">M</div>
+                    </div>
+                </div>
+            </div>
+            <div id="rightMenu">
+                <div id = "rightMenuGrab"></div>
+            </div>
+            <div id="bottomMenu">
+                FLeXaTeXT v. 0.05, licensed under GNU GPLv3
+            </div>
+        </div>
+        <div id="alertLayer">
+            <div class="alertDialog">
+                <div class = "text"></div>
+                <input type="button" class="alertButton" value="Dismiss" /> 
+            </div>
+            <div class="alertInput">
+                <div class = "text"></div>
+                <div class = "inputElement" ></div>
+                <input type="button" class="alertButton" value="Submit" /> 
+            </div>
+            <div class="alertBox" id="scaleBox">
+                <div class="icon"></div>
+                <div class="text">
+                    Zoom: <span id="scaleNumber">100</span>%
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

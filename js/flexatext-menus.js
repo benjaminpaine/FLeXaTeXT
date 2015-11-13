@@ -1,0 +1,153 @@
+$( document ).ready( 
+    function( )
+    {
+        $( document ).on(
+            "click",
+            function( event )
+            {
+                $( "div#menuLayer > div#headMenu > div.menuItem.active" ).removeClass("active");
+                $( "div#menuLayer > div#headMenu > div.menuItem > div.pulldownMenu" ).fadeOut(100);
+                $( "div#menuLayer > div#headMenu > div.menuItem" ).off( "mouseenter" );
+                event.preventDefault( );
+                event.stopPropagation( );
+            }
+        );
+        $( "div#menuLayer > div#leftMenu > div#contextMenu > div.contextSubMenu" ).each(
+            function( )
+            {
+                if( ! $( this ).hasClass( "active" ) )
+                {
+                    $( this ).hide( );
+                }
+            }
+        );
+        $( "div#menuLayer > div#headMenu > div.menuItem" ).each(
+            function( )
+            {
+                $( this ).find( "div.pulldownMenu" ).hide( );
+                $( this ).on(
+                    "click",
+                    function( event )
+                    {
+                        if( !$( this ).hasClass("active") )
+                        {
+                            $( this ).addClass("active");
+                            $( this ).find( "div.pulldownMenu" ).fadeIn(200);
+                            $( "div#menuLayer > div#headMenu > div.menuItem" ).on(
+                                "mouseenter",
+                                function( )
+                                {
+                                    $( this ).siblings( ).each( 
+                                        function ( )
+                                        {
+                                            $( this ).removeClass("active");
+                                            $( this ).find( "div.pulldownMenu" ).fadeOut(100);
+                                        }
+                                    );
+                                    $( this ).addClass("active");
+                                    $( this ).find( "div.pulldownMenu" ).fadeIn(200);
+                                }
+                            );
+                            event.preventDefault( );
+                            event.stopPropagation( );
+                        }
+                    }
+                );
+                if( mac )
+                {
+                    $( this ).find( "div.pulldownMenu" ).find( "div.pulldownItem" ).find( "span.keyboardShortcut" ).find( "span.ctrl" ).html("&#8984");
+                }
+            }
+        );
+        $( "div#menuLayer > div#leftMenu div.menuItem" ).each(
+            function( )
+            {
+                $( this ).on(
+                    "click",
+                    function( event )
+                    {
+                        $( this ).siblings( ).each(
+                            function( )
+                            {
+                                $( this ).removeClass( "active" );
+                            }
+                        );
+                        $( this ).addClass( "active" );
+                        if( $( this ).parent( ).attr( "id" ) == "layerMenu" )
+                        {
+                            menu = $( this ).attr( "id" );
+                            tool = $( "div#menuLayer > div#leftMenu > div#contextMenu > div.contextSubMenu.active" ).removeClass( "active" ).fadeOut( 500 ).finish( ).parent( ).find( "div.contextSubMenu#"+menu ).fadeIn( 500 ).addClass( "active" ).find( "div.menuItem.active" ).attr( "id" );
+                            /*
+                            $( "div#objectLayer" ).css(
+                                {
+                                    "cursor" : "url(images/cursors/" + menu + "_" + tool + ".png), auto" 
+                                }
+                            );
+                            $( "div#objectLayer:active" ).css(
+                                {
+                                    "cursor" : "url(images/cursors/" + menu + "_" + tool + "_active.png), auto" 
+                                }
+                            );
+                            */
+                        }
+                        else
+                        {
+                            tool = $( this ).attr( "id" );
+                            /*
+                            $( "div#objectLayer" ).css(
+                                {
+                                    "cursor" : "url(images/cursors/" + menu + "_" + tool + ".png), auto"
+                                }
+                            );
+                            $( "div#objectLayer" ).mousedown(
+                                function()
+                                {
+                                    $(this).css("cursor","url(images/cursors/"+menu+"_"+tool+"_active.png),auto");
+                                }
+                            );
+                             $( "div#objectLayer" ).mouseup(
+                                function()
+                                {
+                                    $(this).css("cursor","url(images/cursors/"+menu+"_"+tool+".png),auto");
+                                }
+                            );
+                            */
+                        }
+                        bindMouse( );
+                    }
+                );
+            }
+        );
+        $( "div#menuLayer > div#rightMenu > div#rightMenuGrab" ).on(
+            "mousedown",
+            function( event )
+            {
+                var cursorStart = event.pageX;
+                var widthStart = $( "div#rightMenu" ).width( );
+                var objectStart = $( "div#objectLayer" ).width( );
+                $( window ).on(
+                    "mousemove",
+                    function( event2 )
+                    {
+                        var deltaX = event2.pageX;
+                        var newPx = widthStart + (cursorStart - deltaX);
+                        if( newPx >= $( "div#rightMenu div#rightMenuGrab" ).width( ) && newPx <= objectStart )
+                        {
+                            $( "div#rightMenu" ).css("width",newPx+"px");
+                            $( "div#objectLayer" ).css("right",newPx+"px");
+                        }
+                    }
+                );
+                $( window ).on(
+                    "mouseup",
+                    function( )
+                    {
+                        $( window ).off( "mouseup" ).off( "mousemove" );
+                    }
+                );
+                event.preventDefault( );
+                event.stopPropagation( );
+            }
+        );
+    }
+);
