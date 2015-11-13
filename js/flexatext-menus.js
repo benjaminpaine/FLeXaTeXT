@@ -1,3 +1,5 @@
+menuFunctions = [];
+
 $( document ).ready( 
     function( )
     {
@@ -57,6 +59,25 @@ $( document ).ready(
                 {
                     $( this ).find( "div.pulldownMenu" ).find( "div.pulldownItem" ).find( "span.keyboardShortcut" ).find( "span.ctrl" ).html("&#8984");
                 }
+            }
+        );
+        $( "div#menuLayer > div#headMenu > div.menuItem > div.pulldownMenu > div.pulldownItem" ).each(
+            function( )
+            {
+                $( this ).on(
+                    "click",
+                    function( event )
+                    {
+                        var thisMenu = $( this ).parent( ).attr( "id" );
+                        var thisItem = $( this ).attr( "id" );
+                        if( menuFunctions[ thisMenu+"."+thisItem ] !== undefined && ! $( this ).hasClass( "disabled" ) )
+                        {
+                            menuFunctions[ thisMenu+"."+thisItem ]( event );
+                            event.preventDefault( );
+                            event.stopPropagation( );
+                        }
+                    }
+                );
             }
         );
         $( "div#menuLayer > div#leftMenu div.menuItem" ).each(
@@ -149,5 +170,32 @@ $( document ).ready(
                 event.stopPropagation( );
             }
         );
+        /* Special cases for specific browsers: */
+        if( isFirefox )
+        {
+            $( "div#menuLayer > div#headMenu > div.menuItem > div.pulldownMenu > div.pulldownItem#increaseMenu" ).addClass( "disabled" ).attr("tooltip","This feature is not available in Firefox. Use browser zoom instead.");
+            $( "div#menuLayer > div#headMenu > div.menuItem > div.pulldownMenu > div.pulldownItem#decreaseMenu" ).addClass( "disabled" ).attr("tooltip","This feature is not available in Firefox. Use browser zoom instead.");
+        }
     }
 );
+
+menuFunctions[ "window.increaseMenu" ] = function ( event )
+    {
+        currentZoom = parseFloat( $( "body" ).css( "zoom" ) );
+        $( "body" ).css(
+            {
+                "zoom" : (currentZoom + 0.1)
+            }
+        );
+        console.log( currentZoom );
+    };
+menuFunctions[ "window.decreaseMenu" ] = function ( event )
+    {
+        currentZoom = parseFloat( $( "body" ).css( "zoom" ) );
+        $( "body" ).css(
+            {
+                "zoom" : (currentZoom - 0.1)
+            }
+        );
+        console.log( currentZoom );
+    };

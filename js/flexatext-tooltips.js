@@ -4,7 +4,7 @@ $( document ).ready(
     {
         $( "body" ).append( "<div id=\"toolTip\"></div>" );
         $( "div#toolTip" ).hide( );
-        $( "div" ).each(
+        $( "div, input" ).each(
             function( )
             {
                 var tip = $( this ).attr( "tooltip" );

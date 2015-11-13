@@ -104,6 +104,25 @@ shortcut = function( combination, callback, wantedMenu )
 $( document ).ready(
     function( )
     {
+        $( "div, input" ).each(
+            function( )
+            {
+                var combination = $( this ).attr( "shortcut" );
+                var obj = this;
+                if( combination !== undefined )
+                {
+                    if( $( this ).parent( ).hasClass( "contextSubMenu" ) )
+                    {
+                        shortcut( combination, function( ){ $( obj ).trigger( "click" ); }, $( obj ).parent( ).attr( "id" ) );
+                    }
+                    else
+                    {
+                        shortcut( combination, function( ){ $( obj ).trigger( "click" ); } );
+                    }
+                }
+            }
+        );
+        /*
         shortcut( 
             "m",
             function( )
@@ -120,5 +139,6 @@ $( document ).ready(
             },
             "rooms"
         );
+        */
     }
 );

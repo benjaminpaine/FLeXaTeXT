@@ -1,3 +1,5 @@
+mouseEvents = [];
+
 $( document ).ready(
     function( )
     {
@@ -98,7 +100,7 @@ $.fn.extend({
     bounceFade: function( callback )
     {
         callback = callback || function( ){};
-        $( this ).finish( ).fadeIn(100).delay(300).fadeOut(500, callback);
+        $( this ).stop( ).fadeIn(100).delay(300).fadeOut(500, callback);
     },
     grabMove: function( )
     {
@@ -392,47 +394,13 @@ function bindMouse( )
 {
     unbindMouse( );
     hideHandles( );
-    switch( menu )
+    if( mouseEvents [ menu + "." + tool ] !== undefined )
     {
-        case "rooms":
-            switch( tool )
-            {
-                case "move":
-                    $( "div#objectLayer" ).grabSlide();
-                    $( "div#objectLayer > div#objects > div.object" ).each(
-                        function( )
-                        {
-                            $( this ).find( ".objBar" ).fadeIn( 400 ).find( ".grabBar" ).grabMove( );
-                        }
-                    );
-                    break;
-                case "add":
-                    $( "div#objectLayer" ).on(
-                        "click",
-                        function( event )
-                        {
-                            var child = $( "<div class=\"object room\"><div class=\"objBar\"><div class=\"grabBar\"></div><div class=\"objX\">x</div></div><div class=\"body\"></div></div>");
-                            child.appendTo( $( this ).find( "div#objects" ) );
-                            child.css(
-                                {
-                                    "left" : event.pageX+"px",
-                                    "top" : event.pageY+"px"
-                                }
-                            )
-                            .attr("lbase",event.pageX)
-                            .attr("tbase",event.pageY)
-                            .find( "div.objBar" )
-                            .hide( )
-                            .parent( )
-                            .scaleInPlace( objBase );
-                            rooms.push( new room( ) );
-                        }
-                    );
-                    break;
-                default: console.log("Binding error!"); break;
-            }
-            break;
-        default: console.log("Binding error!"); break;
+        mouseEvents[ menu + "." + tool ]();
+    }
+    else
+    {
+        console.log( "Binding error with " + menu + " and " + tool );
     }
 }
 
@@ -444,3 +412,38 @@ Number.prototype.roundTo = function(num) {
         return this+num-resto;
     }
 }
+
+mouseEvents[ "rooms.move" ] = function( )
+    {
+        $( "div#objectLayer" ).grabSlide();
+        $( "div#objectLayer > div#objects > div.object" ).each(
+        function( )
+            {
+                $( this ).find( ".objBar" ).fadeIn( 400 ).find( ".grabBar" ).grabMove( );
+            }
+        );
+    }
+mouseEvents[ "rooms.add" ] = function( )
+    {
+        $( "div#objectLayer" ).on(
+            "click",
+            function( event )
+            {
+                var child = $( "<div class=\"object room\"><div class=\"objBar\"><div class=\"grabBar\"></div><div class=\"objX\">x</div></div><div class=\"body\"></div></div>");
+                child.appendTo( $( this ).find( "div#objects" ) );
+                child.css(
+                {
+                    "left" : event.pageX+"px",
+                    "top" : event.pageY+"px"
+                }
+                )
+                .attr("lbase",event.pageX)
+                .attr("tbase",event.pageY)
+                .find( "div.objBar" )
+                .hide( )
+                .parent( )
+                .scaleInPlace( objBase );
+                rooms.push( new room( ) );
+            }
+        );   
+    }

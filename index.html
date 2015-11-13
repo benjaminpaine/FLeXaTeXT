@@ -44,26 +44,35 @@
             <div id="headMenu">
                 <div class="menuItem">
                     File
-                    <div class="pulldownMenu" style="display: none;">
-                        <div class="pulldownItem" tooltip="Clear all objects, room, and settings.">
+                    <div class="pulldownMenu" id="file" style="display: none;">
+                        <div class="pulldownItem" id="new" tooltip="Clear all objects, room, and settings.">
                             New <span class="keyboardShortcut"><span class="ctrl">Ctrl+</span>N</span>
                         </div>
-                        <div class="pulldownItem" tooltip="Choose a file on the server to work on.">
+                        <div class="pulldownItem" id="open" tooltip="Choose a file on the server to work on.">
                             Open <span class="keyboardShortcut"><span class="ctrl">Ctrl+</span>O</span>
                         </div>
-                        <div class="pulldownItem" tooltip="Save your file.">
+                        <div class="pulldownItem" id="save" tooltip="Save your file.">
                             Save <span class="keyboardShortcut"><span class="ctrl">Ctrl+</span>S</span>
                         </div>
-                        <div class="pulldownItem" tooltip="Upload a saved .json file from your computer." style="border-top: 3px solid #9EA095;">
+                        <div class="pulldownItem" id="upload" tooltip="Upload a saved .json file from your computer." style="border-top: 3px solid #9EA095;">
                             Upload <span class="keyboardShortcut"><span class="ctrl">Ctrl+</span>U</span>
                         </div>
-                        <div class="pulldownItem" tooltip="Download this projects .json file to your computer.">
+                        <div class="pulldownItem" id="download" tooltip="Download this projects .json file to your computer.">
                             Download <span class="keyboardShortcut"><span class="ctrl">Ctrl+</span>D</span>
                         </div>
                     </div>
                 </div>
                 <div class="menuItem">Edit</div>
-                <div class="menuItem">Window</div>
+                <div class="menuItem">Window
+                    <div class="pulldownMenu" id="window" style="display: none;"> 
+                        <div class="pulldownItem" id="increaseMenu" tooltip="Increase the size of all UI elements" shortcut="ctrl+alt+n">
+                            Increase Menu Size <span class="keyboardShortcut"><span class="ctrl">Ctrl+</span>Alt+N</span>
+                        </div>
+                        <div class="pulldownItem" id="decreaseMenu" tooltip="Decrease the size of all UI elements" shortcut="ctrl+alt+m">
+                            Decrease Menu Size <span class="keyboardShortcut"><span class="ctrl">Ctrl+</span>Alt+M</span>
+                        </div>
+                    </div>
+                </div>
                 <div class="menuItem">Settings</div>
                 <div class="menuItem">Help</div>
                 <div id="logo">FLeXaTeXT</div>
@@ -80,8 +89,8 @@
                 <div id="contextMenu">
                     <div class="label">Tools</div>
                     <div class="contextSubMenu active" id="rooms">
-                        <div class="menuItem active" id="move" tooltip="[M] Move and Delete Rooms">M</div>
-                        <div class="menuItem" id="add" tooltip="[A] Add Rooms">+</div>
+                        <div class="menuItem active" id="move" tooltip="[M] Move and Delete Rooms" shortcut = "m">M</div>
+                        <div class="menuItem" id="add" tooltip="[A] Add Rooms" shortcut = "a">+</div>
                         <div class="menuItem" id="connection" tooltip="[C] Select and edit room connections, doors, locks, etc.">C</div>
                         <div class="menuItem" id="description" tooltip="[D] Edit a room&#39;s description, name, and other settings">D</div>
                         <div class="menuItem" id="zoomextents" tooltip="[Z] Zoom window to show all rooms (on this level)">Z</div>

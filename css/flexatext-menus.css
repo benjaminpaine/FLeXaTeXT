@@ -64,7 +64,7 @@ div#menuLayer > div#headMenu > div.menuItem:active, div#menuLayer > div#headMenu
 div#menuLayer > div#headMenu > div.menuItem > div.pulldownMenu
 {
     position: absolute;
-    left: 0;
+    margin-left: -12px;
     top: 40px;
     width: 200px;
     text-align: left;
@@ -76,6 +76,7 @@ div#menuLayer > div#headMenu > div.menuItem > div.pulldownMenu
     border-width: 1px 2px 2px 2px;
     z-index: 2;
 }
+
 div#menuLayer > div#headMenu > div.menuItem > div.pulldownMenu > div.pulldownItem
 {
     background: linear-gradient ( rgba(255,255,255,0.5), rgba(0,0,0,0.5) );
@@ -87,6 +88,17 @@ div#menuLayer > div#headMenu > div.menuItem > div.pulldownMenu > div.pulldownIte
 div#menuLayer > div#headMenu > div.menuItem > div.pulldownMenu > div.pulldownItem:hover
 {
     background-color: rgba(255,255,255,0.3);
+}
+
+div#menuLayer > div#headMenu > div.menuItem > div.pulldownMenu > div.pulldownItem.disabled
+{
+    opacity: 0.2;
+    cursor: not-allowed;
+}
+
+div#menuLayer > div#headMenu > div.menuItem > div.pulldownMenu > div.pulldownItem.disabled:hover
+{
+    background-color: rgba(255,255,255,0);
 }
 
 div#menuLayer > div#headMenu > div.menuItem > div.pulldownMenu > div.pulldownItem > span.keyboardShortcut
