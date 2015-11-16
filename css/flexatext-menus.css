@@ -113,9 +113,18 @@ div#menuLayer > div#headMenu > div#logo
     display: inline-block;
     float: right;
     font-size: 14px;
-    width: 100px;
+    width: 275px;
     height: 40px;
     line-height: 40px;
+    font-family: "Courier New", monospace;
+    font-size: 35px;
+}
+
+div#menuLayer > div#headMenu > div#logo > span#underscore
+{
+    position: relative;
+    left: -15px;
+    top: -8px;
 }
 
 div#menuLayer > div#leftMenu
@@ -354,6 +363,19 @@ div#menuLayer > div#rightMenu > div#rightMenuGrab:hover
 div#menuLayer > div#rightMenu > div#rightMenuGrab:active
 {
     background-color: rgba(255,255,255,0.3);
+}
+
+div#menuLayer > div#rightMenu > div#container
+{
+    display: block;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    right: 0;
+    top: 0;
+    margin-left: 20px;
+    padding: 25px;
+    text-shadow: 1px 1px 1px rgba(255,255,255,0.5);
 }
 
 div#menuLayer > div#bottomMenu

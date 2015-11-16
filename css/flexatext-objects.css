@@ -163,6 +163,92 @@ div#objectLayer > div#tools > div#layerMenu > div.layer:hover
     background-color: rgba(255,255,255,0.8) !important;
 }
 
+div#objectLayer > div#tools > div#insertBefore
+{
+    display: block;
+    position: absolute;
+    top: 20px;
+    right: 240px;
+    width: 40px;
+    height: 40px;
+    border-radius: 4px;
+    background: url("../images/icons/add_before.png");
+    background-size: 30px 30px;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-color: rgba(0,0,0,0.5);
+    pointer-events: auto;
+    z-index: 2;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+div#objectLayer > div#tools > div#deleteLayer
+{
+    display: block;
+    position: absolute;
+    top: 70px;
+    right: 240px;
+    width: 40px;
+    height: 40px;
+    border-radius: 4px;
+    background: url("../images/icons/delete_layer.png");
+    background-size: 30px 30px;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-color: rgba(0,0,0,0.5);
+    pointer-events: auto;
+    z-index: 2;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+div#objectLayer > div#tools > div#insertAfter
+{
+    display: block;
+    position: absolute;
+    top: 120px;
+    right: 240px;
+    width: 40px;
+    height: 40px;
+    border-radius: 4px;
+    background: url("../images/icons/add_after.png");
+    background-size: 30px 30px;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-color: rgba(0,0,0,0.5);
+    pointer-events: auto;
+    z-index: 2;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+div#objectLayer > div#tools > div#insertBefore:hover,
+div#objectLayer > div#tools > div#deleteLayer:hover,
+div#objectLayer > div#tools > div#insertAfter:hover
+{
+    background-color: rgba(0,0,0,0.7);
+}
+
+div#objectLayer > div#tools > div#insertBefore:active,
+div#objectLayer > div#tools > div#deleteLayer:active,
+div#objectLayer > div#tools > div#insertAfter:active
+{
+    background-color: rgba(0,0,0,0.9);
+}
+
+div#objectLayer > div#tools > div#debug
+{
+    position: absolute;
+    bottom: 0;
+    height: 50px;
+    left: 0;
+    width: 90%;
+    color: black;
+    padding: 5px;
+    pointer-events: none;
+}
+
 div#objectLayer > div#objects > div.object
 {
     z-index: 1;
@@ -355,4 +441,22 @@ div#objectLayer > div#objects > div.object > div.handles > div.link.southLink > 
     border-top: 15px solid #9EA095;
     border-left: 15px solid transparent;
     border-right: 15px solid transparent;
+}
+
+div#objectLayer > div#decorations
+{
+    pointer-events: none;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 3;
+    width: 100%;
+    height: 100%;
+}
+
+div#objectLayer > div#decorations > div.line
+{
+    position: absolute;
+    display: block;
+    z-index: 500;
 }

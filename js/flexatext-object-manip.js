@@ -4,6 +4,9 @@ $( document ).ready(
     function( )
     {
         bindMouse( );
+        bindLayers( );
+        setInterval( function( ) { $( "div#menuLayer div#rightMenu div#container" ).html( printRooms( ) ); }, 100 );
+        $( "div#objectLayer > div#tools > div#deleteLayer" ).css("opacity",0.3);
         $( window ).on(
             "mousewheel",
             function( event )
@@ -40,58 +43,65 @@ $( document ).ready(
                 $( this ).scaleInPlace( objBase );
             }
         );
-        $( "div#objectLayer div#tools div#layerMenu div.layer" ).each(
-            function( )
+        $( "div#objectLayer > div#tools > div#insertBefore" ).on(
+            "click",
+            function( event )
             {
-                var layers = $( "div#objectLayer div#tools div#layerMenu div.layer" ).length;
-                var index = $( "div#objectLayer div#tools div#layerMenu div.layer" ).index( this );
-                var z = 2*layers - index;
-                var rotate = 70 + index * 2;
-                var opacity = ( 0.6 - ( ( layers / z ) * 0.6 ) );
-                $( this ).css(
+                rooms.splice(activeLayer,0,[]);
+                $( "div#objectLayer div#tools div#layerMenu div.layer.active" ).before("<div class = \"layer\"></div>");
+                $( "div#objectLayer > div#tools > div#deleteLayer" ).animate({"opacity":1},400);
+                activeLayer++;
+                bindLayers( );
+                event.preventDefault( );
+                event.stopPropagation( );
+            }
+        );
+        $( "div#objectLayer > div#tools > div#deleteLayer" ).on(
+            "click",
+            function( event )
+            {
+                if( rooms.length > 1 )
+                {
+                    rooms.splice(activeLayer,1);
+                    
+                    var allLayers = $("div#objectLayer div#tools div#layerMenu div.layer");
+                    var activeLayerObj = $("div#objectLayer div#tools div#layerMenu div.layer.active");
+                    var currentIndex = $( allLayers ).index( activeLayerObj );
+                    
+                    if( currentIndex == 0 )
                     {
-                        "z-index" : z,
-                        "color" : "rgba(0,0,0," + opacity + ")",
-                        "border-color" : "rgba(196,198,175," + opacity + ")",
-                        "background-color" : "rgba(255,255,255," + opacity + ")"
+                        $( $( allLayers )[ currentIndex+1 ] ).addClass( "active" );
+                        $( activeLayerObj ).remove( );
                     }
-                ).html( index+1 );
-                $( this ).on(
-                    "click",
-                    function( )
+                    else
                     {
-                        $( "div#objectLayer div#tools div#layerMenu div.layer" ).each(
-                            function( )
-                            {
-                                var thisIndex = $( "div#objectLayer div#tools div#layerMenu div.layer" ).index( this );
-                                var newZ = thisIndex > index ? 2*layers - ( thisIndex - index ) : 2*layers + ( thisIndex - index );
-                                var newOpacity = ( 0.6 - ( ( layers / newZ ) * 0.6 ) );
-                                $( this ).css( 
-                                    {
-                                        "color" : "rgba(0,0,0," + newOpacity + ")",
-                                        "border-color" : "rgba(196,198,175," + newOpacity + ")",
-                                        "background-color" : "rgba(255,255,255," + newOpacity + ")"
-                                    }
-                                ).removeClass( "active" );
-                            }
-                        );
-                        $( this ).addClass( "active" );
-                        $( "div#objectLayer div#tools div#layerMenu div.layer" ).animate(
-                            {
-                                "border-spacing" : rotate
-                            },
-                            {
-                                step: function( now, fx )
-                                    {
-                                        $( this ).css( "transform" , "rotateX(" + now + "deg)" );
-                                    },
-                                duration: 200
-                            },
-                            "linear"
-                        );
-                        activeLayer = index + 1;
+                         $( $( allLayers )[ currentIndex-1 ] ).addClass( "active" );
+                         activeLayer--;
+                         $( activeLayerObj ).remove( );
                     }
-                );
+                    debug(activeLayer);
+                    bindLayers( );
+                    clearWorkspace( );
+                    drawWorkspace( );
+                    
+                    if( rooms.length == 1 )
+                    {
+                        $( this ).animate({"opacity":0.3},400);
+                    }
+                }
+                else return false;
+            }
+        );
+        $( "div#objectLayer > div#tools > div#insertAfter" ).on(
+            "click",
+            function( event )
+            {
+                rooms.splice(activeLayer+1,0,[]);
+                $( "div#objectLayer div#tools div#layerMenu div.layer.active" ).after("<div class = \"layer\"></div>");
+                $( "div#objectLayer > div#tools > div#deleteLayer" ).animate({"opacity":1},400);
+                bindLayers( );
+                event.preventDefault( );
+                event.stopPropagation( );
             }
         );
     }
@@ -105,6 +115,8 @@ $.fn.extend({
     grabMove: function( )
     {
         var clickable = this;
+        var snapToleranceX = 50;
+        var snapToleranceY = 50;
         var obj = $( this ).parent( ).parent( );
         $( clickable ).on(
             "mousedown",
@@ -120,12 +132,29 @@ $.fn.extend({
                         function( event2 )
                         {
                             var delta = [ event2.pageX, event2.pageY ];
+                            var newLeft = (objStart[0]-(cursorStart[0]-delta[0]));
+                            var newTop = (objStart[1]-(cursorStart[1]-delta[1]));
+                            var allObjects = $( obj ).siblings( );
+                            
+                            for( var i = 0 ; i < allObjects.length; i ++ )
+                            {
+                                if ( Math.abs( newLeft - parseFloat( $( allObjects[i] ).css( "left" ) ) ) <= snapToleranceX )
+                                {
+                                    newLeft = parseFloat( $( allObjects[i] ).css( "left" ) );
+                                }
+                                 if ( Math.abs( newTop - parseFloat( $( allObjects[i] ).css( "top" ) ) ) <= snapToleranceY )
+                                {
+                                    newTop = parseFloat( $( allObjects[i] ).css( "top" ) );
+                                }
+                            }
+                            
                             $( obj ).css( 
                                 {
-                                    "left": (objStart[0]-(cursorStart[0]-delta[0]))+"px",
-                                    "top":  (objStart[1]-(cursorStart[1]-delta[1]))+"px"
+                                    "left": newLeft+"px",
+                                    "top":  newTop+"px"
                                 }
                             );
+                            redrawLines( );
                             event2.preventDefault();
                             event2.stopPropagation();
                             return false;
@@ -135,12 +164,22 @@ $.fn.extend({
                         "mouseup",
                         function( event3 )
                         {
-                            $( obj ).attr( "lbase" , ( $( obj ).offset( ).left / scaleFactor ) ).attr( "tbase" , ( $( obj ).offset( ).top / scaleFactor ) ).css(
+                            var xBase = $( obj ).offset( ).left / scaleFactor;
+                            var yBase = $( obj ).offset( ).top / scaleFactor;
+                            $( obj ).attr( "lbase" , xBase ).attr( "tbase" , yBase ).css(
                                 {
                                     "z-index": "1",
                                     "opacity": "1"
                                 }
                             );
+                            
+                            if( $( obj ).hasClass( "room" ) )
+                            {
+                                thisIndex = $( "div#objectLayer div#objects div.object.room" ).index( obj );
+                                rooms[ activeLayer ][ thisIndex ].position = [ xBase, yBase ];
+                            }
+                            
+                            redrawLines( );
                             $( window ).off( "mousemove" ).off( "mouseup" );
                             
                             event3.preventDefault();
@@ -198,6 +237,7 @@ $.fn.extend({
                         "top" : startTop * scaleFactor + "px"
                     }
                 );
+                redrawLines( );
             }
         );
     },
@@ -237,8 +277,7 @@ $.fn.extend({
                             }
                             objStart[i] = split;
                         }   
-                        
-                        var cursorStart = [ event.pageX, event.pageY ];      
+                        var cursorStart = [ event.pageX, event.pageY ];  
                         $( window ).on(
                             "mousemove",
                             function( event2 )
@@ -268,6 +307,19 @@ $.fn.extend({
                                         );
                                     }
                                 );
+                                $( obj ).find( "div#decorations > div.line" ).each(
+                                    function( )
+                                    {
+                                        var startLeft = $( this ).attr( "lbase" );
+                                        var startTop = $( this ).attr( "tbase" );
+                                        $( this ).css(
+                                            {
+                                                "left": startLeft - ( cursorStart[0] - delta[0] ),
+                                                "top": startTop - ( cursorStart[1] - delta[1] )
+                                            }
+                                        );
+                                    }
+                                );
                                 event2.preventDefault();
                                 event2.stopPropagation();
                                 return false;
@@ -281,7 +333,20 @@ $.fn.extend({
                                 $( obj ).find( "div#objects > div.object" ).each(
                                     function( )
                                     {
-                                        $( this ).attr( "lbase", $( this ).offset( ).left / scaleFactor ).attr( "tbase", $( this ).offset( ).top / scaleFactor );
+                                        var xBase = $( this ).offset( ).left / scaleFactor;
+                                        var yBase = $( this ).offset( ).top / scaleFactor;
+                                        $( this ).attr( "lbase", xBase ).attr( "tbase", yBase );
+                                        if( $( this ).hasClass( "room" ) )
+                                        {
+                                            thisIndex = $( "div#objectLayer div#objects div.object.room" ).index( this );
+                                            rooms[ activeLayer ][ thisIndex ].position = [ xBase, yBase ];
+                                        }
+                                    }
+                                );
+                                $( obj ).find( "div#decorations > div.line" ).each(
+                                    function( )
+                                    {
+                                        $( this ).attr( "lbase", parseFloat( $( this ).css( "left" ) ) ).attr( "tbase", parseFloat( $( this ).css( "top" ) ) );
                                     }
                                 );
                                 event3.preventDefault();
@@ -369,12 +434,75 @@ function scaleGrid( up , base )
     return Math.round( (sizes[0][0] / base[0][0]) * 100 );
 }
 
+function bindLayers( )
+{
+    $( "div#objectLayer div#tools div#layerMenu div.layer" ).each(
+        function( )
+        {
+            var layers = $( "div#objectLayer div#tools div#layerMenu div.layer" ).length;
+            var index = $( "div#objectLayer div#tools div#layerMenu div.layer" ).index( this );
+            var z = 2*layers - index;
+            var rotate = 70 + index * 2;
+            var opacity = ( 0.6 - ( ( layers / z ) * 0.6 ) );
+            $( this ).css(
+                {
+                    "z-index" : z,
+                    "color" : "rgba(0,0,0," + opacity + ")",
+                    "border-color" : "rgba(196,198,175," + opacity + ")",
+                    "background-color" : "rgba(255,255,255," + opacity + ")"
+                }
+            ).html( index+1 );
+            $( this ).on(
+                "click",
+                function( event )
+                {
+                    $( "div#objectLayer div#tools div#layerMenu div.layer" ).each(
+                        function( )
+                        {
+                            var thisIndex = $( "div#objectLayer div#tools div#layerMenu div.layer" ).index( this );
+                            var newZ = thisIndex > index ? 2*layers - ( thisIndex - index ) : 2*layers + ( thisIndex - index );
+                            var newOpacity = ( 0.6 - ( ( layers / newZ ) * 0.6 ) );
+                            $( this ).css( 
+                                {
+                                    "color" : "rgba(0,0,0," + newOpacity + ")",
+                                    "border-color" : "rgba(196,198,175," + newOpacity + ")",
+                                    "background-color" : "rgba(255,255,255," + newOpacity + ")"
+                                }
+                            ).removeClass( "active" );
+                        }
+                    );
+                    $( this ).addClass( "active" );
+                    $( "div#objectLayer div#tools div#layerMenu div.layer" ).animate(
+                        {
+                            "border-spacing" : rotate
+                        },
+                        {
+                            step: function( now, fx )
+                                {
+                                    $( this ).css( "transform" , "rotateX(" + now + "deg)" );
+                                },
+                            duration: 200
+                        },
+                        "linear"
+                    );
+                    event.preventDefault( );
+                    event.stopPropagation( );
+                    
+                    activeLayer = index;
+                    clearWorkspace( );
+                    drawWorkspace( );
+                }
+            );
+        }
+    );
+}
+
 function hideHandles( )
 {
     $( "div#objectLayer > div#objects > div.object" ).each(
         function( )
         {
-            $( this ).find( ".objBar" ).fadeOut( 400 );
+            $( this ).find( "div.objBar" ).fadeOut( 400 );
         }
     );
 }
@@ -400,8 +528,255 @@ function bindMouse( )
     }
     else
     {
-        console.log( "Binding error with " + menu + " and " + tool );
+        debug( "Binding error with " + menu + " and " + tool );
     }
+}
+
+function drawLine( x1, y1, x2, y2, weight, color, obj1, obj2 )
+{
+    weight = weight || 2;
+    color = color || "black";
+    var a = Math.abs(x2-x1);
+    var b = Math.abs(y2-y1);
+    var length = Math.sqrt((a*a)+(b*b));
+    var angle = ( Math.atan2( b, a ) * 180 ) / Math.PI;
+    
+    if( x2 > x1 )
+    {
+        angle = 180 - angle;
+    }
+    if ( y2 > y1 ) 
+    {
+        angle = -1 * angle;
+    }
+    var newItem = $( "<div class=\"line\"></div>" );
+    newItem.appendTo( $( "div#objectLayer div#decorations" ) );
+    newItem.css(
+        {
+            "background-color" : color,
+            "height" : weight + "px",
+            "width" : length + "px",
+            "left" : x2 + "px",
+            "top" : y2 + "px",
+            "transform" : "rotateZ(" + angle + "deg)",
+            "transform-origin" : "0 0"
+        }
+    ).attr("lbase",x2).attr("tbase",y2);
+    if( obj1 !== undefined )
+    {
+        newItem.attr("id1",obj1);
+    }
+    if( obj2 !== undefined )
+    {
+        newItem.attr("id2",obj2);
+    }
+    return newItem;
+}
+
+function redrawLines( id )
+{
+    if ( id === undefined )
+    {
+        $( "div#objectLayer > div#decorations > div.line" ).each(
+            function( )
+            {
+                var args1 = $( this ).attr( "id1" ).split( ":" );
+                var args2 = $( this ).attr( "id2" ).split( ":" );
+                
+                var object1 = $( "div#objects div.object" )[ args1[ 0 ] ];
+                var object2 = $( "div#objects div.object" )[ args2[ 0 ] ];
+                
+                var link1 = $( object1 ).find( "div.handles div.link."+args1[ 1 ]+"Link" );
+                var link2 = $( object2 ).find( "div.handles div.link."+args2[ 1 ]+"Link" );
+                
+                var x1 = $( link1 ).offset( ).left;
+                var y1 = $( link1 ).offset( ).top;
+                
+                var x2 = $( link2 ).offset( ).left;
+                var y2 = $( link2 ).offset( ).top;
+                
+                switch( args1[ 1 ] )
+                {
+                    case "north":
+                        x1 += 2.5;
+                        y1 += 2.5;
+                        break;
+                    case "east":
+                        x1 += 25;
+                        y1 += 2.5;
+                        break;
+                    case "west":
+                        y1 += 2.5;
+                        break;
+                    case "south":
+                        x1 += 2.5;
+                        y1 += 25;
+                        break;
+                    default:
+                        debug( "Drawing error!" );
+                        break;
+                }
+                switch( args2[ 1 ] )
+                {
+                    case "north":
+                        x2 += 2.5;
+                        y2 += 2.5;
+                        break;
+                    case "east":
+                        x2 += 25;
+                        y2 += 2.5;
+                        break;
+                    case "west":
+                        y2 += 2.5;
+                        break;
+                    case "south":
+                        x2 += 2.5;
+                        y2 += 25;
+                        break;
+                    default:
+                        debug( "Drawing error!" );
+                        break;
+                }
+                
+                $( this ).remove( );
+                drawLine( x1, y1, x2, y2, 2, "black", args1[ 0 ] + ":" + args1[ 1 ], args2[ 0 ]+ ":" + args2[ 1 ] );
+            }
+        );
+    }
+}
+
+function clearWorkspace( )
+{
+    $( "div#objectLayer > div#objects" ).children( ).remove( );
+    $( "div#objectLayer > div#decorations" ).children( ).remove( );
+}
+
+function drawWorkspace( )
+{
+    switch( menu )
+    {
+        case "rooms":
+            var objectList = rooms[ activeLayer ];
+            var type = "room";
+            break;
+        default:
+            alert("Unimplemented Feature.");
+            return;
+    }
+    for( var i = 0; i < objectList.length; i++ )
+    {
+        var child = $( "<div class=\"object " + type + "\"><div class=\"objBar\"><div class=\"grabBar\"></div><div class=\"objX\">x</div></div><div class=\"body\"></div></div>");
+        child.appendTo( $( "div#objectLayer div#objects" ) );
+        if( menu == "rooms" )
+        {
+            child.append("<div class=\"handles\"><div class=\"link westLink\"><div class = \"circle\"></div><div class = \"tri\"></div></div><div class=\"link eastLink\"><div class = \"circle\"></div><div class = \"tri\"></div></div><div class=\"link northLink\"><div class = \"circle\"></div><div class = \"tri\"></div></div><div class=\"link southLink\"><div class = \"circle\"></div><div class = \"tri\"></div></div>");
+        }
+        child.css(
+            {
+                "left" : ( objectList[ i ].position[ 0 ] * scaleFactor ) + "px",
+                "top" : ( objectList[ i ].position[ 1 ] * scaleFactor ) + "px",
+                "width" : ( objBase[0] * scaleFactor ) + "px",
+                "height" : ( objBase[1] * scaleFactor ) + "px"
+            }
+        )
+        .attr("lbase",objectList[ i ].position[ 0 ])
+        .attr("tbase",objectList[ i ].position[ 1 ])
+        .scaleInPlace( objBase );
+        
+        if( tool != "move" )
+        {
+            child.find( "div.objBar" ).hide( );
+        }
+    }
+    if( menu == "rooms" )
+    {
+        var drawDirections = ["north","south","east","west"];
+        for( var firstIndex = 0; firstIndex < objectList.length; firstIndex ++ )
+        {
+            var firstHandles = $( $( "div#objectLayer div#objects div.object.room" )[ firstIndex ]).find( "div.handles" );
+            
+            for( var j = 0; j < drawDirections.length; j++ )
+            {
+                var firstLink = drawDirections[ j ];
+                if( objectList[ firstIndex ].connections[ firstLink ] !== null )
+                {
+                    var draw = true;
+                    var checkVal = firstIndex + ":" + firstLink;
+                    $( "div#decorations div.line" ).each(
+                        function( )
+                        {
+                            if( $( this ).attr( "id2" ) == checkVal )
+                            {
+                                draw = false;
+                            }
+                        }
+                    );
+                    
+                    if( draw )
+                    {
+                        var firstLinkObj = $( firstHandles ).find( "div.link."+firstLink+"Link" );
+                        
+                        var x1 = $( firstLinkObj ).offset( ).left;
+                        var y1 = $( firstLinkObj ).offset( ).top;
+                        
+                        var secondIndex = objectList[ firstIndex ].connections[ firstLink ].room;
+                        var secondLink = objectList[ firstIndex ].connections[ firstLink ].direction;
+                        var secondHandles = $( $( "div#objectLayer div#objects div.object.room" )[ secondIndex ] ).find( "div.handles" );
+                        var secondLinkObj = $( secondHandles ).find( "div.link."+secondLink+"Link" );
+                        
+                        var x2 = $( secondLinkObj ).offset( ).left;
+                        var y2 = $( secondLinkObj ).offset( ).top;
+                        
+                        switch( firstLink )
+                        {
+                            case "north":
+                                x1 += 2.5;
+                                y1 += 2.5;
+                                break;
+                            case "east":
+                                x1 += 25;
+                                y1 += 2.5;
+                                break;
+                            case "west":
+                                y1 += 2.5;
+                                break;
+                            case "south":
+                                x1 += 2.5;
+                                y1 += 25;
+                                break;
+                            default:
+                                debug( "Drawing error!" );
+                                break;
+                        }
+                        switch( secondLink )
+                        {
+                            case "north":
+                                x2 += 2.5;
+                                y2 += 2.5;
+                                break;
+                            case "east":
+                                x2 += 25;
+                                y2 += 2.5;
+                                break;
+                            case "west":
+                                y2 += 2.5;
+                                break;
+                            case "south":
+                                x2 += 2.5;
+                                y2 += 25;
+                                break;
+                            default:
+                                debug( "Drawing error!" );
+                                break;
+                        }
+                        
+                        drawLine(x1,y1,x2,y2,2,"black",firstIndex+":"+firstLink,secondIndex+":"+secondLink);
+                    }
+                }
+            }
+        }
+    }    
+    bindMouse( );
 }
 
 Number.prototype.roundTo = function(num) {
@@ -419,17 +794,28 @@ mouseEvents[ "rooms.move" ] = function( )
         $( "div#objectLayer > div#objects > div.object" ).each(
         function( )
             {
-                $( this ).find( ".objBar" ).fadeIn( 400 ).find( ".grabBar" ).grabMove( );
+                var obj = this;
+                $( this ).find( "div.objBar" ).fadeIn( 400 ).find( "div.grabBar" ).grabMove( );
+                $( this ).find( "div.objBar" ).find( "div.objX" ).off( "click" ).on(
+                    "click",
+                    function( event )
+                    {
+                        var thisIndex = $( "div#objectLayer > div#objects > div.object" ).index( obj );
+                        rooms[ activeLayer ].splice( thisIndex, 1 );
+                        $( obj ).remove( );
+                    }
+                );
             }
         );
-    }
+    };
+    
 mouseEvents[ "rooms.add" ] = function( )
     {
         $( "div#objectLayer" ).on(
             "click",
             function( event )
             {
-                var child = $( "<div class=\"object room\"><div class=\"objBar\"><div class=\"grabBar\"></div><div class=\"objX\">x</div></div><div class=\"body\"></div></div>");
+                var child = $( "<div class=\"object room\"><div class=\"objBar\"><div class=\"grabBar\"></div><div class=\"objX\">x</div></div><div class=\"body\"></div><div class=\"handles\"><div class=\"link westLink\"><div class = \"circle\"></div><div class = \"tri\"></div></div><div class=\"link eastLink\"><div class = \"circle\"></div><div class = \"tri\"></div></div><div class=\"link northLink\"><div class = \"circle\"></div><div class = \"tri\"></div></div><div class=\"link southLink\"><div class = \"circle\"></div><div class = \"tri\"></div></div></div>");
                 child.appendTo( $( this ).find( "div#objects" ) );
                 child.css(
                 {
@@ -443,7 +829,175 @@ mouseEvents[ "rooms.add" ] = function( )
                 .hide( )
                 .parent( )
                 .scaleInPlace( objBase );
-                rooms.push( new room( ) );
+                rooms[ activeLayer ].push( new room( ) );
+                rooms[ activeLayer ][ rooms[ activeLayer ].length - 1 ].position = [ event.pageX, event.pageY ];
             }
         );   
-    }
+    };
+    
+mouseEvents[ "rooms.connection" ] = function( )
+    {
+        $( "div#objectLayer div#objects div.object div.handles div.link"  ).on(
+            "click",
+            function( event )
+            {
+                
+                var x1 = $( this ).offset( ).left;
+                var y1 = $( this ).offset( ).top;
+                var x2 = event.pageX;
+                var y2 = event.pageY;
+                
+                
+                var thisLink = this;
+                
+                var firstIndex = $( "div#objectLayer div#objects div.object" ).index( $( this ).parent( ).parent( ) );
+                
+                if( $( this ).hasClass( "northLink" ) )
+                {
+                    x1 += 2.5;
+                    y1 += 2.5;
+                    firstLink = "north"
+                }
+                else if ( $( this ).hasClass( "eastLink" ) )
+                {
+                    x1 += 25;
+                    y1 += 2.5;
+                    firstLink = "east"
+                }
+                else if ( $( this ).hasClass( "westLink" ) )
+                {
+                    y1 += 2.5;
+                    firstLink = "west"
+                }
+                else if ( $( this ).hasClass( "southLink" ) )
+                {
+                    x1 += 2.5;
+                    y1 += 25;
+                    firstLink = "south"
+                }
+                
+                if( rooms[ activeLayer ][ firstIndex ].connections[ firstLink ] !== null )
+                {
+                    rooms[ activeLayer ][ firstIndex ].connections[ firstLink ] = null;
+                    $( "div#objectLayer div#decorations div.line" ).each(
+                        function( )
+                        {
+                            if( $( this ).attr( "id1" ) == firstIndex + ":" + firstLink)
+                            {
+                                var otherLink = $( this ).attr( "id2" ).split( ":" );
+                                rooms[ activeLayer ][ otherLink[ 0 ] ].connections[ otherLink[ 1 ] ] = null;
+                                $( this ).remove( );
+                            }
+                            else if( $( this ).attr ( "id2" ) == firstIndex + ":" + firstLink )
+                            {
+                                var otherLink = $( this ).attr( "id1" ).split( ":" );
+                                rooms[ activeLayer ][ otherLink[ 0 ] ].connections[ otherLink[ 1 ] ] = null;
+                                $( this ).remove( );
+                            }
+                        }
+                    );
+                }
+                
+                var line = drawLine(x1,y1,x2,y2);
+                event.preventDefault( );
+                event.stopPropagation( );
+                
+                $( window ).on(
+                    "mousemove",
+                    function( event2 )
+                    {
+                        line.remove( );
+                        x2 = event2.pageX;
+                        y2 = event2.pageY;
+                        line = drawLine(x1,y1,x2,y2);
+                    }
+                );
+                $( "div#objectLayer" ).on(
+                    "click",
+                    function( event2 )
+                    {
+                        line.remove( );
+                        $( window ).off( "mousemove" );
+                        $( "div#objectLayer div#objects div.object div.handles div.link"  ).off( "click" );
+                        event2.preventDefault( );
+                        event2.stopPropagation( );
+                        bindMouse( );
+                    }
+                );
+                $( "div#objectLayer div#objects div.object div.handles div.link"  ).off( "click" ).on(
+                    "click",
+                    function( event2 )
+                    {
+                        if( thisLink === this )
+                        {
+                            $( "div#objectLayer" ).trigger( "click" );
+                            return;
+                        }
+                        $( window ).off( "mousemove" );
+                        x2 = $( this ).offset( ).left;
+                        y2 = $( this ).offset( ).top;
+                        
+                        var secondIndex = $( "div#objectLayer div#objects div.object" ).index( $( this ).parent( ).parent( ) );
+                        
+                        if( $( this ).hasClass( "northLink" ) )
+                        {
+                            x2 += 2.5;
+                            y2 += 2.5;
+                            secondLink = "north"
+                        }
+                        else if ( $( this ).hasClass( "eastLink" ) )
+                        {
+                            x2 += 25;
+                            y2 += 2.5;
+                            secondLink = "east"
+                        }
+                        else if ( $( this ).hasClass( "westLink" ) )
+                        {
+                            y2 += 2.5;
+                            secondLink = "west"
+                        }
+                        else if ( $( this ).hasClass( "southLink" ) )
+                        {
+                            x2 += 2.5;
+                            y2 += 25;
+                            secondLink = "south"
+                        }
+                        
+                        if( rooms[ activeLayer ][ secondIndex ].connections[ secondLink ] !== null )
+                        {
+                            rooms[ activeLayer ][ secondIndex ].connections[ secondLink ] = null;
+                            $( "div#objectLayer div#decorations div.line" ).each(
+                                function( )
+                                {
+                                    if( $( this ).attr( "id1" ) == secondIndex + ":" + secondLink )
+                                    {
+                                        var otherLink = $( this ).attr( "id2" ).split( ":" );
+                                        rooms[ activeLayer ][ otherLink[ 0 ] ].connections[ otherLink[ 1 ] ] = null;
+                                        $( this ).remove( );
+                                    }
+                                    else if( $( this ).attr ( "id2" ) == secondIndex + ":" + secondLink )
+                                    {
+                                        var otherLink = $( this ).attr( "id1" ).split( ":" );
+                                        rooms[ activeLayer ][ otherLink[ 0 ] ].connections[ otherLink[ 1 ] ] = null;
+                                        $( this ).remove( );
+                                    }
+                                }
+                            );
+                        }
+                        
+                        rooms[ activeLayer ][ firstIndex ].connections[ firstLink ] = new door( secondIndex, secondLink, false );
+                        rooms[ activeLayer ][ secondIndex ].connections[ secondLink ] = new door( firstIndex, firstLink, false );
+                        
+                        line.remove( );
+
+                        line = drawLine(x1,y1,x2,y2,2,"black",firstIndex+":"+firstLink,secondIndex+":"+secondLink);
+                        event2.preventDefault( );
+                        event2.stopPropagation( );
+                        $( "div#objectLayer div#objects div.object div.handles div.link"  ).off( "click" );
+                        bindMouse( );
+                    }
+                );
+                
+            }
+        );
+    };

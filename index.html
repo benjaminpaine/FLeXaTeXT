@@ -21,46 +21,21 @@
     <body>
         <div id="objectLayer">
             <div id = "objects">
-                <div class="object room" style="left:400px;top:400px;" lbase=400 tbase=400>
-                    <div class="objBar">
-                        <div class="grabBar">
-                            
-                        </div>
-                        <div class="objX">x</div>
-                    </div>
-                    <div class="handles">
-                        <div class="link westLink">
-                            <div class = "circle"></div>
-                            <div class = "tri"></div>
-                        </div>
-                        <div class="link eastLink">
-                            <div class = "circle"></div>
-                            <div class = "tri"></div>
-                        </div>
-                        <div class="link northLink">
-                            <div class = "circle"></div>
-                            <div class = "tri"></div>
-                        </div>
-                        <div class="link southLink">
-                            <div class = "circle"></div>
-                            <div class = "tri"></div>
-                        </div>
-                    </div>
-                    <div class="body">
-                        
-                    </div>
-                </div>
             </div>
             <div id = "tools">
                 <div id = "compass"></div>
                 <div id = "zoomPlus" tooltip = "[Mousewheel Up] Zoom In"></div>
                 <div id = "zoomMinus" tooltip = "[Mousewheel Down] Zoom Out"></div>
+                <div id = "insertBefore" tooltip = "Insert layer before current layer" ></div>
+                <div id = "deleteLayer" tooltip = "Delete current layer" ></div>
+                <div id = "insertAfter" tooltip = "Insert layer after current layer" ></div>
                 <div id = "layerMenu">
                     <div class = "layer active"></div>
-                    <div class = "layer"></div>
-                    <div class = "layer"></div>
-                    <div class = "layer"></div>
                 </div>
+                <div id = "debug" ></div>
+            </div>
+            <div id = "decorations">
+            
             </div>
         </div>
         <div id="menuLayer">
@@ -98,7 +73,7 @@
                 </div>
                 <div class="menuItem">Settings</div>
                 <div class="menuItem">Help</div>
-                <div id="logo">FLeXaTeXT</div>
+                <div id="logo">&gt; FLeXaTeXT <span id = "underscore">_</span></div>
             </div>
             <div id="leftMenu">
                 <div id="layerMenu">
@@ -140,9 +115,12 @@
             </div>
             <div id="rightMenu">
                 <div id = "rightMenuGrab"></div>
+                <div id = "container" >
+                
+                </div>
             </div>
             <div id="bottomMenu">
-                FLeXaTeXT v. 0.05, licensed under GNU GPLv3
+                FLeXaTeXT v. 0.10<sub>a</sub>, licensed under GNU GPLv3
             </div>
         </div>
         <div id="alertLayer">
