@@ -2,7 +2,7 @@ $( document ).ready(
     function( )
     {
         $( "#alertLayer" ).children( ).hide( );
-        //dialog( "<h1>Welcome to FLeXaTeXT!</h1>This appears to be your first time. Don't worry, I'll be gentle." );
+        // dialog( "<h1>Welcome to FLeXaTeXT!</h1>This appears to be your first time. Don't worry, I'll be gentle." );
     }
 );
 function dialog( text )

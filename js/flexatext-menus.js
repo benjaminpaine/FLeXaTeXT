@@ -98,41 +98,10 @@ $( document ).ready(
                         {
                             menu = $( this ).attr( "id" );
                             tool = $( "div#menuLayer > div#leftMenu > div#contextMenu > div.contextSubMenu.active" ).removeClass( "active" ).fadeOut( 500 ).finish( ).parent( ).find( "div.contextSubMenu#"+menu ).fadeIn( 500 ).addClass( "active" ).find( "div.menuItem.active" ).attr( "id" );
-                            /*
-                            $( "div#objectLayer" ).css(
-                                {
-                                    "cursor" : "url(images/cursors/" + menu + "_" + tool + ".png), auto" 
-                                }
-                            );
-                            $( "div#objectLayer:active" ).css(
-                                {
-                                    "cursor" : "url(images/cursors/" + menu + "_" + tool + "_active.png), auto" 
-                                }
-                            );
-                            */
                         }
                         else
                         {
                             tool = $( this ).attr( "id" );
-                            /*
-                            $( "div#objectLayer" ).css(
-                                {
-                                    "cursor" : "url(images/cursors/" + menu + "_" + tool + ".png), auto"
-                                }
-                            );
-                            $( "div#objectLayer" ).mousedown(
-                                function()
-                                {
-                                    $(this).css("cursor","url(images/cursors/"+menu+"_"+tool+"_active.png),auto");
-                                }
-                            );
-                             $( "div#objectLayer" ).mouseup(
-                                function()
-                                {
-                                    $(this).css("cursor","url(images/cursors/"+menu+"_"+tool+".png),auto");
-                                }
-                            );
-                            */
                         }
                         bindMouse( );
                     }

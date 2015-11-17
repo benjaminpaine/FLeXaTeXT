@@ -1,4 +1,5 @@
 mouseEvents = [];
+cursor = [];
 
 $( document ).ready(
     function( )
@@ -528,9 +529,19 @@ function unbindMouse( )
     );
 }
 
+function unbindCursor( )
+{
+    $( "div#objectLayer, div#objectLayer > div#objects div" ).css(
+        {
+            "cursor" : "default"
+        }
+    );
+}
+
 function bindMouse( )
 {
     unbindMouse( );
+    unbindCursor( );
     hideHandles( );
     if( mouseEvents [ menu + "." + tool ] !== undefined )
     {
@@ -539,6 +550,15 @@ function bindMouse( )
     else
     {
         debug( "Binding error with " + menu + " and " + tool );
+    }
+    
+    if( cursor[ menu + "." + tool ] !== undefined )
+    {
+        cursor[ menu + "." + tool ]();
+    }
+    else
+    {
+        debug( "Cursor not found with " + menu + " and " + tool + ". Reverting to default." );
     }
 }
 
@@ -851,6 +871,34 @@ Number.prototype.roundTo = function(num) {
         return this+num-resto;
     }
 }
+
+cursor[ "rooms.move" ] = function( )
+    {
+        $( "div#objectLayer" ).css(
+            {
+                "cursor" : "url(images/cursors/rooms_move.png), auto"
+            }
+        );
+        $( "div#objectLayer > div#objects > div.object > div.objBar > div.grabBar" ).css(
+            {
+                "cursor" : "url(images/cursors/rooms_move.png), auto"
+            }
+        );
+        $( "div#objectLayer > div#objects > div.object > div.objBar > div.objX" ).css(
+            {
+                "cursor" : "url(images/cursors/rooms_delete.png), auto"
+            }
+        );
+    };
+    
+cursor[ "rooms.add" ] = function( )
+    {
+        $( "div#objectLayer" ).css(
+            {
+                "cursor" : "url(images/cursors/rooms_add.png), auto"
+            }
+        );
+    };
 
 mouseEvents[ "rooms.move" ] = function( )
     {
