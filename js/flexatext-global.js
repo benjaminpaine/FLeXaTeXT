@@ -15,6 +15,7 @@ var actions = [];
 var events = [];
 var settings = [];
 
+var debugInterval;
 var isOpera = !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
 var isFirefox = typeof InstallTrigger !== 'undefined';
 var isSafari = Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0;
@@ -52,7 +53,6 @@ $( document ).ready(
         );
     }
 );
-
 function debug( message )
 {
     $( "div#objectLayer > div#tools > div#debug" ).html( message ).show( ).delay( 1000 ).fadeOut( 1000 );

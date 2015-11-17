@@ -47,6 +47,13 @@ h3
     font-size: 28px;
 }
 
+h4
+{
+    font-size: 24px;
+    display: block;
+    margin-bottom: 5px;
+}
+
 sub
 {
     font-size:0.75em;

@@ -3,6 +3,12 @@ function door(room, destDirection, locked)
     this.room = room;
     this.direction = destDirection;
     this.locked = locked || false;
+    this.lockedMessage = "That way is locked.";
+    this.unlock = function( message )
+    {
+        this.locked = false;
+        return message;
+    }
 }
 
 function connections( )
@@ -68,16 +74,6 @@ function objectList( object )
         };
 }
 
-function locked( n, s, e, w, u, d )
-{
-    this.north = n || "That way is locked.";
-    this.south = s || "That way is locked.";
-    this.east = e || "That way is locked.";
-    this.west = w || "That way is locked.";
-    this.up = u || "That way is locked.";
-    this.down = d || "That way is locked.";
-}
-
 function nopath( n, s, e, w, u, d )
 {
     this.north = n || "There's no path to go that way.";
@@ -92,22 +88,36 @@ function room( )
 {
     this.name = "My Room";
     this.description = "It's a room. The walls are white, the floor is solid. Why are you here?";
+    this.layer = activeLayer;
     this.objects = new objectList( );
     this.connections = new connections( );
     this.nopath = new nopath( );
-    this.locked = new locked( );
     this.position = [0,0];
     this.go = function( direction )
         {
-            if( connections.direction === null )
+            if( connections[ direction ] === null )
             {
-                return nopath.direction;
+                return nopath[ direction ];
             }
-            else if ( connections.direction.locked )
+            else if ( connections[ direction ].locked )
             {
-                return locked.direction;
+                return connections[ direction ].lockedMessage;
             }
-            else return rooms[ connections.direction.room ];
+            else
+            {
+                if( direction == "up" )
+                {
+                    return rooms[ layer + 1 ][ connections[ direction ].room ];
+                }
+                else if( direction == "down" )
+                {
+                    return rooms[ layer - 1 ][ connections[ direction ].room ];
+                }
+                else
+                {
+                    return rooms[ layer ][ connections[ direction ].room ];
+                }
+            }
         };
 }
 
@@ -117,8 +127,8 @@ function printRoom( index )
 {
     var string = "";
     
-    string += "<strong>Room Index:</strong> " + index + "<br />";
     string += "<strong>Room Name:</strong> " + rooms[ activeLayer ][ index ].name + "<br />";
+    
     if ( rooms[ activeLayer ][ index ].objects.list.length == 0 )
     {
         string += "<strong>Objects:</strong> None <br />";
@@ -127,93 +137,7 @@ function printRoom( index )
     {
         // TODO
     }
-    string += "<strong>Object Position:</strong> (" + rooms[ activeLayer ][ index ].position[0] + "," + rooms[ activeLayer ][ index ].position[1] + ") <br />";
-    
-    if ( rooms[ activeLayer ][ index ].connections.none() )
-    {
-        string += "<strong>Connections:</strong> None<br />";
-    }
-    else
-    {
-        if ( rooms[ activeLayer ][ index ].connections.north !== null )
-        {
-            string += "<strong>North:</strong>" + "[" + rooms[ activeLayer ][ index ].connections.north.room + "] " + rooms[ activeLayer ][ rooms[ activeLayer ] [ index ].connections.north.room ].name + " (" + rooms[ activeLayer ][ index ].connections.north.direction + ")";
-            if( rooms[ activeLayer ][ index ].connections.north.locked )
-            {
-                string += " <strong>LOCKED</strong>";
-            }
-            else
-            {
-                string += " <strong>UNLOCKED</strong>";
-            }
-            string += "<br />";
-        }
-        if ( rooms[ activeLayer ][ index ].connections.south !== null )
-        {
-            string += "<strong>South:</strong>" + "[" + rooms[ activeLayer ][ index ].connections.south.room + "] " + rooms[ activeLayer ][ rooms[ activeLayer ] [ index ].connections.south.room ].name + " (" + rooms[ activeLayer ][ index ].connections.south.direction + ")";
-            if( rooms[ activeLayer ][ index ].connections.south.locked )
-            {
-                string += " <strong>LOCKED</strong>";
-            }
-            else
-            {
-                string += " <strong>UNLOCKED</strong>";
-            }
-            string += "<br />";
-        }
-        if ( rooms[ activeLayer ][ index ].connections.west !== null )
-        {
-            string += "<strong>West:</strong>" + "[" + rooms[ activeLayer ][ index ].connections.west.room + "] " + rooms[ activeLayer ][ rooms[ activeLayer ] [ index ].connections.west.room ].name + " (" + rooms[ activeLayer ][ index ].connections.west.direction + ")";
-            if( rooms[ activeLayer ][ index ].connections.west.locked )
-            {
-                string += " <strong>LOCKED</strong>";
-            }
-            else
-            {
-                string += " <strong>UNLOCKED</strong>";
-            }
-            string += "<br />";
-        }
-        if ( rooms[ activeLayer ][ index ].connections.east !== null )
-        {
-            string += "<strong>East:</strong>" + "[" + rooms[ activeLayer ][ index ].connections.east.room + "] " + rooms[ activeLayer ][ rooms[ activeLayer ] [ index ].connections.east.room ].name + " (" + rooms[ activeLayer ][ index ].connections.east.direction + ")";
-            if( rooms[ activeLayer ][ index ].connections.east.locked )
-            {
-                string += " <strong>LOCKED</strong>";
-            }
-            else
-            {
-                string += " <strong>UNLOCKED</strong>";
-            }
-            string += "<br />";
-        }
-        if ( rooms[ activeLayer ][ index ].connections.down !== null )
-        {
-            string += "<strong>Down:</strong>" + "[" + rooms[ activeLayer ][ index ].connections.down.room + "] " + rooms[ activeLayer ][ rooms[ activeLayer ] [ index ].connections.down.room ].name + " (" + rooms[ activeLayer ][ index ].connections.down.direction + ")";
-            if( rooms[ activeLayer ][ index ].connections.down.locked )
-            {
-                string += " <strong>LOCKED</strong>";
-            }
-            else
-            {
-                string += " <strong>UNLOCKED</strong>";
-            }
-            string += "<br />";
-        }
-        if ( rooms[ activeLayer ][ index ].connections.up !== null )
-        {
-            string += "<strong>Up:</strong>" + "[" + rooms[ activeLayer ][ index ].connections.up.room + "] " + rooms[ activeLayer ][ rooms[ activeLayer ] [ index ].connections.up.room ].name + " (" + rooms[ activeLayer ][ index ].connections.up.direction + ")";
-            if( rooms[ activeLayer ][ index ].connections.up.locked )
-            {
-                string += " <strong>LOCKED</strong>";
-            }
-            else
-            {
-                string += " <strong>UNLOCKED</strong>";
-            }
-            string += "<br />";
-        }
-    }
+    string += "<strong>Room Description:</strong><br />" + rooms[ activeLayer ][ index ].description;
     return string;
 }
 function printRooms( )

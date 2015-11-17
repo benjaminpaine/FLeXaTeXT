@@ -265,6 +265,18 @@ div#objectLayer > div#objects > div.object
     cursor: default;
 }
 
+div#objectLayer > div#objects > div.object > div.body
+{
+    position: absolute;
+    width: 300px;
+    height: 160px;
+    bottom: 0px;
+    left: 0px;
+    padding: 15px;
+    font-size: 14px;
+    overflow: hidden;
+}
+
 div#objectLayer > div#objects > div.object > div.objBar > div.grabBar
 {
     display: inline-block;
@@ -459,4 +471,49 @@ div#objectLayer > div#decorations > div.line
     position: absolute;
     display: block;
     z-index: 500;
+}
+
+div#objectLayer > div#decorations > div.line > div.mouseHandle
+{
+    height: 500%;
+    width: 100%;
+    position: absolute;
+    left: 0px;
+    top: -225%;
+    z-index: 501;
+}
+
+div#objectLayer > div#decorations > div.line > div.mouseHandle:hover
+{
+    box-shadow: 0px 0px 10px rgba(0,0,0,0.7);
+}
+
+div#objectLayer > div#decorations > div.line > div.rightArrow
+{
+    position: absolute;
+    left: 15%;
+    top: -18px;
+    display: block;
+    border-left: 20px solid green;
+    border-top: 20px solid transparent;
+    border-bottom: 20px solid transparent;
+}
+
+div#objectLayer > div#decorations > div.line > div.leftArrow
+{
+    position: absolute;
+    right: 15%;
+    top: -18px;
+    display: block;
+    border-right: 20px solid green;
+    border-top: 20px solid transparent;
+    border-bottom: 20px solid transparent;
+}
+div#objectLayer > div#decorations > div.line > div.rightArrow.locked
+{
+    border-left: 20px solid red;
+}
+div#objectLayer > div#decorations > div.line > div.leftArrow.locked
+{
+    border-right: 20px solid red;
 }

@@ -179,6 +179,11 @@ $( document ).ready(
     }
 );
 
+function parameterDisplay( content )
+{
+    $( "div#menuLayer > div#rightMenu > div#container" ).html( content );
+}
+
 menuFunctions[ "window.increaseMenu" ] = function ( event )
     {
         currentZoom = parseFloat( $( "body" ).css( "zoom" ) );
@@ -187,7 +192,6 @@ menuFunctions[ "window.increaseMenu" ] = function ( event )
                 "zoom" : (currentZoom + 0.1)
             }
         );
-        console.log( currentZoom );
     };
 menuFunctions[ "window.decreaseMenu" ] = function ( event )
     {
@@ -197,5 +201,4 @@ menuFunctions[ "window.decreaseMenu" ] = function ( event )
                 "zoom" : (currentZoom - 0.1)
             }
         );
-        console.log( currentZoom );
     };

@@ -5,7 +5,6 @@ $( document ).ready(
     {
         bindMouse( );
         bindLayers( );
-        setInterval( function( ) { $( "div#menuLayer div#rightMenu div#container" ).html( printRooms( ) ); }, 100 );
         $( "div#objectLayer > div#tools > div#deleteLayer" ).css("opacity",0.3);
         $( window ).on(
             "mousewheel",
@@ -235,6 +234,11 @@ $.fn.extend({
                         "height" : base[1] * scaleFactor + "px",
                         "left" : startLeft * scaleFactor + "px",
                         "top" : startTop * scaleFactor + "px"
+                    }
+                ).find ( "div.body" ).css(
+                    {
+                        "width": base[0] * scaleFactor + "px",
+                        "height" : ( base[1] - 40 ) * scaleFactor + "px"
                     }
                 );
                 redrawLines( );
@@ -499,10 +503,16 @@ function bindLayers( )
 
 function hideHandles( )
 {
+    clearInterval( debugInterval );
     $( "div#objectLayer > div#objects > div.object" ).each(
         function( )
         {
             $( this ).find( "div.objBar" ).fadeOut( 400 );
+        }
+    );
+    $( "div#objectLayer > div#decorations > div.line" ).css(
+        {
+            "pointer-events" : "none"
         }
     );
 }
@@ -510,7 +520,7 @@ function hideHandles( )
 function unbindMouse( )
 {
     $( "div#objectLayer" ).off( "mouseup" ).off( "mousedown" ).off( "click" );
-    $( "div#objectLayer > div#objects > div.objects" ).off( "mouseup" ).off( "mousedown" ).off( "click" ).find( "div" ).each( 
+    $( "div#objectLayer > div#objects > div.object" ).off( "mouseup" ).off( "mousedown" ).off( "click" ).find( "div" ).each( 
         function( )
         {
             $( this ).off( "mouseup" ).off( "mousedown" ).off( "click" );
@@ -532,7 +542,7 @@ function bindMouse( )
     }
 }
 
-function drawLine( x1, y1, x2, y2, weight, color, obj1, obj2 )
+function drawLine( x1, y1, x2, y2, weight, color, obj1, obj2, locked1, locked2 )
 {
     weight = weight || 2;
     color = color || "black";
@@ -549,7 +559,14 @@ function drawLine( x1, y1, x2, y2, weight, color, obj1, obj2 )
     {
         angle = -1 * angle;
     }
-    var newItem = $( "<div class=\"line\"></div>" );
+    if( menu == "rooms" )
+    {
+        var newItem = $( "<div class=\"line\"><div class=\"mouseHandle\"></div><div class=\"rightArrow\"></div><div class=\"leftArrow\"></div></div>" );
+    }
+    else
+    {
+        var newItem = $( "<div class=\"line\"></div>" );
+    }
     newItem.appendTo( $( "div#objectLayer div#decorations" ) );
     newItem.css(
         {
@@ -569,6 +586,14 @@ function drawLine( x1, y1, x2, y2, weight, color, obj1, obj2 )
     if( obj2 !== undefined )
     {
         newItem.attr("id2",obj2);
+    }
+    if( locked1 !== undefined && locked1 )
+    {
+        newItem.find( "div.rightArrow" ).addClass( "locked" );
+    }
+    if( locked2 !== undefined && locked2 )
+    {
+        newItem.find( "div.leftArrow" ).addClass( "locked" );
     }
     return newItem;
 }
@@ -638,8 +663,27 @@ function redrawLines( id )
                         break;
                 }
                 
-                $( this ).remove( );
-                drawLine( x1, y1, x2, y2, 2, "black", args1[ 0 ] + ":" + args1[ 1 ], args2[ 0 ]+ ":" + args2[ 1 ] );
+               
+                if( menu == "rooms" )
+                {
+                    var locked1 = $( this ).find( "div.rightArrow" ).hasClass( "locked" );
+                    var locked2 = $( this ).find( "div.leftArrow" ).hasClass( "locked" );
+                    $( this ).remove( );
+                    var line = drawLine( x1, y1, x2, y2, 2, "black", args1[ 0 ] + ":" + args1[ 1 ], args2[ 0 ]+ ":" + args2[ 1 ], locked1, locked2 );
+                }
+                else
+                {
+                    $( this ).remove( );
+                    var line = drawLine( x1, y1, x2, y2, 2, "black", args1[ 0 ] + ":" + args1[ 1 ], args2[ 0 ]+ ":" + args2[ 1 ] );
+                }
+                if( menu == "rooms" && tool == "connection" )
+                {
+                    line.css(
+                        {
+                            "pointer-events": "auto"
+                        }
+                    );
+                }
             }
         );
     }
@@ -660,7 +704,7 @@ function drawWorkspace( )
             var type = "room";
             break;
         default:
-            alert("Unimplemented Feature.");
+            debug("Unimplemented Feature.");
             return;
     }
     for( var i = 0; i < objectList.length; i++ )
@@ -686,6 +730,16 @@ function drawWorkspace( )
         if( tool != "move" )
         {
             child.find( "div.objBar" ).hide( );
+        }
+        
+        switch(menu)
+        {
+            case "rooms" : 
+                child.find( "div.body" ).html( printRoom( i ) );
+                break;
+            default:
+                debug( "Unimplemented feature!" );
+                break;
         }
     }
     if( menu == "rooms" )
@@ -769,8 +823,18 @@ function drawWorkspace( )
                                 debug( "Drawing error!" );
                                 break;
                         }
+                        var locked2 = objectList[ firstIndex ].connections[ firstLink ].locked;
+                        var locked1 = objectList[ secondIndex ].connections[ secondLink ].locked;
                         
-                        drawLine(x1,y1,x2,y2,2,"black",firstIndex+":"+firstLink,secondIndex+":"+secondLink);
+                        var line = drawLine(x1,y1,x2,y2,2,"black",firstIndex+":"+firstLink,secondIndex+":"+secondLink, locked1, locked2);
+                        if( menu == "rooms" && tool == "connection" )
+                        {
+                            line.css(
+                                {
+                                    "pointer-events": "auto"
+                                }
+                            );
+                        }
                     }
                 }
             }
@@ -790,6 +854,7 @@ Number.prototype.roundTo = function(num) {
 
 mouseEvents[ "rooms.move" ] = function( )
     {
+        debugInterval = setInterval( function( ){ $( "div#menuLayer > div#rightMenu > div#container" ).html( printRooms( ) ) }, 500 );
         $( "div#objectLayer" ).grabSlide();
         $( "div#objectLayer > div#objects > div.object" ).each(
         function( )
@@ -802,6 +867,28 @@ mouseEvents[ "rooms.move" ] = function( )
                     {
                         var thisIndex = $( "div#objectLayer > div#objects > div.object" ).index( obj );
                         rooms[ activeLayer ].splice( thisIndex, 1 );
+                        var checkConnections = ["north","south","east","west","up","down"];
+                        var allLines = $( "div#objectLayer > div#decorations > div.line" );
+                        for( var i = 0; i < rooms[ activeLayer ].length; i++ )
+                        {
+                            for( var j = 0; j < checkConnections.length; j++ )
+                            {
+                                if( rooms[ activeLayer ][ i ].connections[ checkConnections[ j ] ] !== null &&
+                                    rooms[ activeLayer ][ i ].connections[ checkConnections[ j ] ].room == thisIndex )
+                                {
+                                    rooms[ activeLayer ][ i ].connections[ checkConnections[ j ] ] = null;
+                                }
+                            }
+                        }
+                        for( var i = 0; i < allLines.length; i++ )
+                        {
+                            var thisLine = allLines[ i ];
+                            var checkVals = [ $( thisLine ).attr( "id1" ).split( ":" ), $( thisLine ).attr( "id2" ).split( ":" ) ];
+                            if( checkVals [ 0 ][ 0 ] == thisIndex || checkVals [ 1 ][ 0 ] == thisIndex )
+                            {
+                                $( thisLine ).remove( );
+                            }
+                        }
                         $( obj ).remove( );
                     }
                 );
@@ -815,21 +902,25 @@ mouseEvents[ "rooms.add" ] = function( )
             "click",
             function( event )
             {
+                rooms[ activeLayer ].push( new room( ) );
                 var child = $( "<div class=\"object room\"><div class=\"objBar\"><div class=\"grabBar\"></div><div class=\"objX\">x</div></div><div class=\"body\"></div><div class=\"handles\"><div class=\"link westLink\"><div class = \"circle\"></div><div class = \"tri\"></div></div><div class=\"link eastLink\"><div class = \"circle\"></div><div class = \"tri\"></div></div><div class=\"link northLink\"><div class = \"circle\"></div><div class = \"tri\"></div></div><div class=\"link southLink\"><div class = \"circle\"></div><div class = \"tri\"></div></div></div>");
                 child.appendTo( $( this ).find( "div#objects" ) );
                 child.css(
-                {
-                    "left" : event.pageX+"px",
-                    "top" : event.pageY+"px"
-                }
+                    {
+                        "left" : event.pageX+"px",
+                        "top" : event.pageY+"px"
+                    }
                 )
                 .attr("lbase",event.pageX)
                 .attr("tbase",event.pageY)
                 .find( "div.objBar" )
                 .hide( )
                 .parent( )
+                .find( "div.body" )
+                .html( printRoom( rooms.length-1 ) )
+                .parent( )
                 .scaleInPlace( objBase );
-                rooms[ activeLayer ].push( new room( ) );
+                
                 rooms[ activeLayer ][ rooms[ activeLayer ].length - 1 ].position = [ event.pageX, event.pageY ];
             }
         );   
@@ -837,6 +928,88 @@ mouseEvents[ "rooms.add" ] = function( )
     
 mouseEvents[ "rooms.connection" ] = function( )
     {
+        $( "div#objectLayer div#decorations div.line" ).each(
+            function( )
+            {
+                $( this ).css(
+                    {
+                        "pointer-events" : "auto"
+                    }
+                ).on(
+                    "click",
+                    function( )
+                    {
+                        var obj = this;
+                        var attributes = [ $( this ).attr( "id1" ).split( ":" ), $( this ).attr( "id2" ).split( ":" ) ];
+                        var room1 = rooms[ activeLayer ][ attributes [ 0 ][ 0 ] ];
+                        var room2 = rooms[ activeLayer ][ attributes [ 1 ][ 0 ] ];
+                        
+                        var string = "<h1>Door</h1><div class=\"optionsBox\"><div class=\"title\">"+ room1.name + " (" + attributes[ 0 ][ 1 ]+ ") to " + room2.name + " (" + attributes [ 1 ][ 1 ] + ")</div><div class=\"checkBox\"><div class=\"box\">&nbsp;</div><div class=\"label\">Locked</div></div><h4>Locked Message:</h4><textarea></textarea></div><div class=\"optionsBox\"><div class=\"title\">"+ room2.name + " (" + attributes[ 1 ][ 1 ]+ ") to " + room1.name + " (" + attributes [ 0 ][ 1 ] + ")</div><div class=\"checkBox\"><div class=\"box\">&nbsp;</div><div class=\"label\">Locked</div></div><h4>Locked Message:</h4><textarea></textarea></div>";
+                        var newBox = $( string );
+                        
+                        var locked = [ room1.connections[ attributes [ 0 ][ 1 ] ].locked, room2.connections[ attributes [ 1 ][ 1 ] ].locked ];
+                        
+                        if( locked[ 0 ] )
+                        {
+                            $( newBox.find( "div.checkBox > div.box" )[0] ).html( "&#10004;" );
+                        }
+                        
+                        if( locked[ 1 ] )
+                        {
+                            $( newBox.find( "div.checkBox > div.box" )[1] ).html( "&#10004;" );
+                        }
+                        
+                        $( newBox.find( "textarea" )[0] ).val( room1.connections[ attributes [ 0 ][ 1 ] ].lockedMessage );
+                        $( newBox.find( "textarea" )[1] ).val( room2.connections[ attributes [ 1 ][ 1 ] ].lockedMessage );
+                        
+                        newBox.find( "div.checkBox > div.box" ).on(
+                            "click",
+                            function( event )
+                            {
+                                var thisIndex = $( "div#menuLayer > div#rightMenu > div#container > div.optionsBox" ).index($( this ).parent( ).parent( ));
+                                if( locked[ thisIndex ] )
+                                {
+                                    rooms[ activeLayer ][ attributes [ thisIndex ][ 0 ] ].connections[ attributes [ thisIndex ][ 1 ] ].locked = false;
+                                    locked[ thisIndex ] = false;
+                                    $( this ).html( "&nbsp;" );
+                                    switch( thisIndex )
+                                    {
+                                        case 1: $( obj ).find( "div.rightArrow" ).removeClass( "locked" ); break;
+                                        case 0: $( obj ).find( "div.leftArrow" ).removeClass( "locked" ); break;
+                                        default: debug( "Some error occurred in editing connection." ); break;
+                                    }
+                                }
+                                else
+                                {
+                                    rooms[ activeLayer ][ attributes [ thisIndex ][ 0 ] ].connections[ attributes [ thisIndex ][ 1 ] ].locked = true;
+                                    locked[ thisIndex ] = true;
+                                    $( this ).html( "&#10004;" );
+                                    switch( thisIndex )
+                                    {
+                                        case 1: $( obj ).find( "div.rightArrow" ).addClass( "locked" ); break;
+                                        case 0: $( obj ).find( "div.leftArrow" ).addClass( "locked" ); break;
+                                        default: debug( "Some error occurred in editing connection." ); break;
+                                    }
+                                }
+                                
+                                event.preventDefault( );
+                                event.stopPropagation( );
+                            }
+                        );
+                        
+                        newBox.find( "textarea" ).on(
+                            "blur",
+                            function( )
+                            {
+                                var thisIndex = $( "div#menuLayer > div#rightMenu > div#container > div.optionsBox" ).index($( this ).parent( ));
+                                rooms[ activeLayer ][ attributes [ thisIndex ][ 0 ] ].connections[ attributes [ thisIndex ][ 1 ] ].lockedMessage = $( this ).val( );
+                            }
+                        );
+                        parameterDisplay( newBox );
+                    }
+                );
+            }
+        );
         $( "div#objectLayer div#objects div.object div.handles div.link"  ).on(
             "click",
             function( event )
@@ -991,6 +1164,11 @@ mouseEvents[ "rooms.connection" ] = function( )
                         line.remove( );
 
                         line = drawLine(x1,y1,x2,y2,2,"black",firstIndex+":"+firstLink,secondIndex+":"+secondLink);
+                        line.css(
+                            {
+                                "pointer-events": "auto"
+                            }
+                        );
                         event2.preventDefault( );
                         event2.stopPropagation( );
                         $( "div#objectLayer div#objects div.object div.handles div.link"  ).off( "click" );
