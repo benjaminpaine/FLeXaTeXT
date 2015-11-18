@@ -504,11 +504,22 @@ function bindLayers( )
 
 function hideHandles( )
 {
-    clearInterval( debugInterval );
+    parameterDisplay( "" );
     $( "div#objectLayer > div#objects > div.object" ).each(
         function( )
         {
             $( this ).find( "div.objBar" ).fadeOut( 400 );
+            
+            $( this ).css(
+                {
+                    "box-shadow" : "4px 4px 10px rgba(0,0,0,0.3)"
+                }
+            );
+            
+            if( ! ( menu == "rooms" && tool == "connection" ) )
+            {
+                $( this ).find( "div.handles" ).fadeTo( 400, 0.2 );
+            }
         }
     );
     $( "div#objectLayer > div#decorations > div.line" ).css(
@@ -521,7 +532,7 @@ function hideHandles( )
 function unbindMouse( )
 {
     $( "div#objectLayer" ).off( "mouseup" ).off( "mousedown" ).off( "click" );
-    $( "div#objectLayer > div#objects > div.object" ).off( "mouseup" ).off( "mousedown" ).off( "click" ).find( "div" ).each( 
+    $( "div#objectLayer > div#objects > div.object" ).off( "mouseup" ).off( "mousedown" ).off( "click" ).off( "mouseenter" ).off( "mouseleave" ).find( "div" ).each( 
         function( )
         {
             $( this ).off( "mouseup" ).off( "mousedown" ).off( "click" );
@@ -886,7 +897,7 @@ cursor[ "rooms.move" ] = function( )
         );
         $( "div#objectLayer > div#objects > div.object > div.objBar > div.objX" ).css(
             {
-                "cursor" : "url(images/cursors/rooms_delete.png), auto"
+                "cursor" : "url(images/cursors/rooms_delete.png), pointer"
             }
         );
     };
@@ -895,14 +906,42 @@ cursor[ "rooms.add" ] = function( )
     {
         $( "div#objectLayer" ).css(
             {
-                "cursor" : "url(images/cursors/rooms_add.png), auto"
+                "cursor" : "url(images/cursors/rooms_add.png), pointer"
             }
         );
     };
 
+cursor[ "rooms.connection" ] = function( )
+    {
+        $( "div#objectLayer > div#objects > div.room.object > div.handles > div.link" ).css(
+            {
+                "cursor" : "url(images/cursors/rooms_connection_new.png), pointer"
+            }
+        );
+        
+        $( "div#objectLayer > div#objects > div.room.object > div.handles > div.link > div" ).css(
+            {
+                "cursor" : "url(images/cursors/rooms_connection_new.png), pointer"
+            }
+        );
+        
+        $( "div#objectLayer > div#decorations > div.line" ).css(
+            {
+                "cursor" : "url(images/cursors/rooms_connection_edit.png), pointer"
+            }
+        );
+    };
+    
+cursor[ "rooms.description" ] = function( )
+    {
+            $( "div#objectLayer > div#objects > div.room.object" ).css(
+                {
+                    "cursor" : "url(images/cursors/rooms_description.png), pointer"
+                }
+            );
+    };
 mouseEvents[ "rooms.move" ] = function( )
     {
-        debugInterval = setInterval( function( ){ $( "div#menuLayer > div#rightMenu > div#container" ).html( printRooms( ) ) }, 500 );
         $( "div#objectLayer" ).grabSlide();
         $( "div#objectLayer > div#objects > div.object" ).each(
         function( )
@@ -976,6 +1015,7 @@ mouseEvents[ "rooms.add" ] = function( )
     
 mouseEvents[ "rooms.connection" ] = function( )
     {
+        $( "div#objectLayer div#objects div.object div.handles" ).fadeTo( 400, 1 );
         $( "div#objectLayer div#decorations div.line" ).each(
             function( )
             {
@@ -992,7 +1032,7 @@ mouseEvents[ "rooms.connection" ] = function( )
                         var room1 = rooms[ activeLayer ][ attributes [ 0 ][ 0 ] ];
                         var room2 = rooms[ activeLayer ][ attributes [ 1 ][ 0 ] ];
                         
-                        var string = "<h1>Door</h1><div class=\"optionsBox\"><div class=\"title\">"+ room1.name + " (" + attributes[ 0 ][ 1 ]+ ") to " + room2.name + " (" + attributes [ 1 ][ 1 ] + ")</div><div class=\"checkBox\"><div class=\"box\">&nbsp;</div><div class=\"label\">Locked</div></div><h4>Locked Message:</h4><textarea></textarea></div><div class=\"optionsBox\"><div class=\"title\">"+ room2.name + " (" + attributes[ 1 ][ 1 ]+ ") to " + room1.name + " (" + attributes [ 0 ][ 1 ] + ")</div><div class=\"checkBox\"><div class=\"box\">&nbsp;</div><div class=\"label\">Locked</div></div><h4>Locked Message:</h4><textarea></textarea></div>";
+                        var string = "<h1>Door</h1><div class=\"optionsBox\"><div class=\"title\">"+ room1.name + " (" + attributes[ 0 ][ 1 ]+ ") to " + room2.name + " (" + attributes [ 1 ][ 1 ] + ")</div><div class=\"checkBox\"><div class=\"box\">&nbsp;</div><div class=\"label\">Locked</div></div><h4>Locked Message:</h4><textarea></textarea></div><div class=\"optionsBox\"><div class=\"title\">"+ room2.name + " (" + attributes[ 1 ][ 1 ]+ ") to " + room1.name + " (" + attributes [ 0 ][ 1 ] + ")</div><div class=\"checkBox\"><div class=\"box\">&nbsp;</div><div class=\"label\">Locked</div></div><h4>Locked Message:</h4><textarea></textarea></div><div class=\"button delete\">Delete</div>";
                         var newBox = $( string );
                         
                         var locked = [ room1.connections[ attributes [ 0 ][ 1 ] ].locked, room2.connections[ attributes [ 1 ][ 1 ] ].locked ];
@@ -1053,7 +1093,21 @@ mouseEvents[ "rooms.connection" ] = function( )
                                 rooms[ activeLayer ][ attributes [ thisIndex ][ 0 ] ].connections[ attributes [ thisIndex ][ 1 ] ].lockedMessage = $( this ).val( );
                             }
                         );
+                        
                         parameterDisplay( newBox );
+                        
+                        $( "div#menuLayer > div#rightMenu > div#container" ).find( "div.button.delete" ).on(
+                        "click",
+                        function( event )
+                            {
+                                rooms[ activeLayer ][ attributes [ 0 ][ 0 ] ].connections[ attributes [ 0 ][ 1 ] ] = null;
+                                rooms[ activeLayer ][ attributes [ 1 ][ 0 ] ].connections[ attributes [ 1 ][ 1 ] ] = null;
+                                $( obj ).remove( );
+                                parameterDisplay( "" );
+                                event.preventDefault( );
+                                event.stopPropagation( );
+                            }
+                        );
                     }
                 );
             }
@@ -1223,6 +1277,39 @@ mouseEvents[ "rooms.connection" ] = function( )
                         bindMouse( );
                     }
                 );
+                
+            }
+        );
+    };
+    
+mouseEvents[ "rooms.description" ] = function( )
+    {
+        $( "div#objectLayer > div#objects > div.room.object" ).on(
+            "mouseenter",
+            function( )
+            {
+                $( this ).css(
+                    {
+                        "box-shadow" : "4px 4px 10px rgba(0,0,0,0.3), 0px 0px 25px #C7E32A"
+                    }
+                );
+            }
+        );
+        $( "div#objectLayer > div#objects > div.room.object" ).on(
+            "mouseleave",
+            function( )
+            {
+                $( this ).css(
+                    {
+                        "box-shadow" : "4px 4px 10px rgba(0,0,0,0.3)"
+                    }
+                );
+            }
+        );
+        $( "div#objectLayer > div#objects > div.room.object" ).on(
+            "click",
+            function( )
+            {
                 
             }
         );
