@@ -994,16 +994,24 @@ mouseEvents[ "rooms.add" ] = function( )
                 child.appendTo( $( this ).find( "div#objects" ) );
                 child.css(
                     {
-                        "left" : event.pageX+"px",
-                        "top" : event.pageY+"px"
+                        "left" : event.pageX + "px",
+                        "top" : event.pageY + "px",
+                        "width" : objBase[ 0 ] * scaleFactor + "px",
+                        "height" : objBase[ 1 ] * scaleFactor + "px"
                     }
                 )
-                .attr("lbase",event.pageX)
-                .attr("tbase",event.pageY)
+                .attr("lbase",event.pageX * ( 1 / scaleFactor ) )
+                .attr("tbase",event.pageY * ( 1 / scaleFactor ) )
                 .find( "div.objBar" )
                 .hide( )
                 .parent( )
                 .find( "div.body" )
+                .css(
+                    {
+                        "width" : objBase[ 0 ] * scaleFactor + "px",
+                        "height" : ( objBase[ 1 ] - 40 ) * scaleFactor + "px"
+                    }
+                )
                 .html( printRoom( rooms.length-1 ) )
                 .parent( )
                 .scaleInPlace( objBase );
@@ -1032,7 +1040,7 @@ mouseEvents[ "rooms.connection" ] = function( )
                         var room1 = rooms[ activeLayer ][ attributes [ 0 ][ 0 ] ];
                         var room2 = rooms[ activeLayer ][ attributes [ 1 ][ 0 ] ];
                         
-                        var string = "<h1>Door</h1><div class=\"optionsBox\"><div class=\"title\">"+ room1.name + " (" + attributes[ 0 ][ 1 ]+ ") to " + room2.name + " (" + attributes [ 1 ][ 1 ] + ")</div><div class=\"checkBox\"><div class=\"box\">&nbsp;</div><div class=\"label\">Locked</div></div><h4>Locked Message:</h4><textarea></textarea></div><div class=\"optionsBox\"><div class=\"title\">"+ room2.name + " (" + attributes[ 1 ][ 1 ]+ ") to " + room1.name + " (" + attributes [ 0 ][ 1 ] + ")</div><div class=\"checkBox\"><div class=\"box\">&nbsp;</div><div class=\"label\">Locked</div></div><h4>Locked Message:</h4><textarea></textarea></div><div class=\"button delete\">Delete</div>";
+                        var string = "<h2>Door</h2><div class=\"optionsBox\"><div class=\"title\">"+ room1.name + " (" + attributes[ 0 ][ 1 ]+ ") to " + room2.name + " (" + attributes [ 1 ][ 1 ] + ")</div><div class=\"checkBox\"><div class=\"box\">&nbsp;</div><div class=\"label\">Locked</div></div><h4>Locked Message:</h4><textarea></textarea></div><div class=\"optionsBox\"><div class=\"title\">"+ room2.name + " (" + attributes[ 1 ][ 1 ]+ ") to " + room1.name + " (" + attributes [ 0 ][ 1 ] + ")</div><div class=\"checkBox\"><div class=\"box\">&nbsp;</div><div class=\"label\">Locked</div></div><h4>Locked Message:</h4><textarea></textarea></div><div class=\"button delete\">Delete</div>";
                         var newBox = $( string );
                         
                         var locked = [ room1.connections[ attributes [ 0 ][ 1 ] ].locked, room2.connections[ attributes [ 1 ][ 1 ] ].locked ];
@@ -1308,9 +1316,17 @@ mouseEvents[ "rooms.description" ] = function( )
         );
         $( "div#objectLayer > div#objects > div.room.object" ).on(
             "click",
-            function( )
+            function( event )
             {
+                var thisIndex = $( "div#objectLayer > div#objects > div.room.object" ).index( this );
+                var thisRoom = rooms[ activeLayer ][ thisIndex ];
                 
+                var string = "<h2>" + thisRoom.name + "</h2><div class=\"optionsBox\"><h4>Name:</h4><input type=\"text\" id=\"name\" value=\"" + thisRoom.name + "\" /><h4>Description:</h4><textarea>" + thisRoom.description+ "</textarea></div>";
+                var newElement = $( string );
+                parameterDisplay( newElement );
+                
+                event.preventDefault( );
+                event.stopPropagation( );
             }
         );
     };
