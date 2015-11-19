@@ -3,11 +3,12 @@ menuFunctions = [];
 $( document ).ready( 
     function( )
     {
+        $( "div#menuLayer > div#leftMenu, div#menuLayer > div#leftMenu div, div#menuLayer > div#headMenu, div#menuLayer > div#headMenu div" ).disableTextSelect( );
         $( document ).on(
             "click",
             function( event )
             {
-                $( "div#menuLayer > div#headMenu > div.menuItem.active" ).removeClass("active");
+                $( "div#menuLayer > div#headMenu > div.menuItem.active" ).removeClass( "active" );
                 $( "div#menuLayer > div#headMenu > div.menuItem > div.pulldownMenu" ).fadeOut(100);
                 $( "div#menuLayer > div#headMenu > div.menuItem" ).off( "mouseenter" );
                 event.preventDefault( );
@@ -31,9 +32,9 @@ $( document ).ready(
                     "click",
                     function( event )
                     {
-                        if( !$( this ).hasClass("active") )
+                        if( !$( this ).hasClass( "active" ) )
                         {
-                            $( this ).addClass("active");
+                            $( this ).addClass( "active" );
                             $( this ).find( "div.pulldownMenu" ).fadeIn(200);
                             $( "div#menuLayer > div#headMenu > div.menuItem" ).on(
                                 "mouseenter",
@@ -42,11 +43,11 @@ $( document ).ready(
                                     $( this ).siblings( ).each( 
                                         function ( )
                                         {
-                                            $( this ).removeClass("active");
+                                            $( this ).removeClass( "active" );
                                             $( this ).find( "div.pulldownMenu" ).fadeOut(100);
                                         }
                                     );
-                                    $( this ).addClass("active");
+                                    $( this ).addClass( "active" );
                                     $( this ).find( "div.pulldownMenu" ).fadeIn(200);
                                 }
                             );
@@ -57,7 +58,7 @@ $( document ).ready(
                 );
                 if( mac )
                 {
-                    $( this ).find( "div.pulldownMenu" ).find( "div.pulldownItem" ).find( "span.keyboardShortcut" ).find( "span.ctrl" ).html("&#8984");
+                    $( this ).find( "div.pulldownMenu" ).find( "div.pulldownItem" ).find( "span.keyboardShortcut" ).find( "span.ctrl" ).html( "&#8984" );
                 }
             }
         );
@@ -121,9 +122,10 @@ $( document ).ready(
                     {
                         var deltaX = event2.pageX;
                         var newPx = widthStart + (cursorStart - deltaX);
-                        if( newPx >= $( "div#rightMenu div#rightMenuGrab" ).width( ) && newPx <= objectStart )
+                        if( newPx >= 60 && newPx <= objectStart )
                         {
                             $( "div#rightMenu" ).css("width",newPx+"px");
+                            $( "div#rightMenu > div#container" ).css("width",( newPx - 20 )+"px");
                             $( "div#objectLayer" ).css("right",newPx+"px");
                         }
                     }
@@ -144,6 +146,46 @@ $( document ).ready(
         {
             $( "div#menuLayer > div#headMenu > div.menuItem > div.pulldownMenu > div.pulldownItem#increaseMenu" ).addClass( "disabled" ).attr("tooltip","This feature is not available in Firefox. Use browser zoom instead.");
             $( "div#menuLayer > div#headMenu > div.menuItem > div.pulldownMenu > div.pulldownItem#decreaseMenu" ).addClass( "disabled" ).attr("tooltip","This feature is not available in Firefox. Use browser zoom instead.");
+        }
+    }
+);
+
+$.fn.extend(
+    {
+        disableTextSelect: function( ) 
+        {
+            return this.each(
+                function( )
+                {
+                    if( isFirefox )
+                    {
+                        $( this ).css(
+                            {
+                                "MozUserSelect" : "none"
+                            }
+                        );
+                    }
+                    else if( isIE )
+                    {
+                        $( this ).on(
+                            "selectstart",
+                            function( )
+                            {
+                                return false;
+                            }
+                        );
+                    }
+                    else{
+                        $( this ).on(
+                            "mousedown",
+                            function( )
+                            {
+                                return false;
+                            }
+                        );
+                    }
+                }
+            );
         }
     }
 );

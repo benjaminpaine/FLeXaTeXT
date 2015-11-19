@@ -106,225 +106,56 @@ $( document ).ready(
         );
     }
 );
-$.fn.extend({
-    bounceFade: function( callback )
+$.fn.extend(
     {
-        callback = callback || function( ){};
-        $( this ).stop( ).fadeIn(100).delay(300).fadeOut(500, callback);
-    },
-    grabMove: function( )
-    {
-        var clickable = this;
-        var snapToleranceX = 50;
-        var snapToleranceY = 50;
-        var obj = $( this ).parent( ).parent( );
-        $( clickable ).on(
-            "mousedown",
-            function( event )
-            {
-                holdStarter = setTimeout(function() {
-                    holdStarter = null;
-                    holdActive = true;
-                    var objStart = [ $( obj ).offset( ).left, $( obj ).offset( ).top ];
-                    var cursorStart = [ event.pageX, event.pageY ];
-                    $( window ).on(
-                        "mousemove",
-                        function( event2 )
-                        {
-                            var delta = [ event2.pageX, event2.pageY ];
-                            var newLeft = (objStart[0]-(cursorStart[0]-delta[0]));
-                            var newTop = (objStart[1]-(cursorStart[1]-delta[1]));
-                            var allObjects = $( obj ).siblings( );
-                            
-                            for( var i = 0 ; i < allObjects.length; i ++ )
-                            {
-                                if ( Math.abs( newLeft - parseFloat( $( allObjects[i] ).css( "left" ) ) ) <= snapToleranceX )
-                                {
-                                    newLeft = parseFloat( $( allObjects[i] ).css( "left" ) );
-                                }
-                                 if ( Math.abs( newTop - parseFloat( $( allObjects[i] ).css( "top" ) ) ) <= snapToleranceY )
-                                {
-                                    newTop = parseFloat( $( allObjects[i] ).css( "top" ) );
-                                }
-                            }
-                            
-                            $( obj ).css( 
-                                {
-                                    "left": newLeft+"px",
-                                    "top":  newTop+"px"
-                                }
-                            );
-                            redrawLines( );
-                            event2.preventDefault();
-                            event2.stopPropagation();
-                            return false;
-                        }
-                    );
-                    $( window ).on(
-                        "mouseup",
-                        function( event3 )
-                        {
-                            var xBase = $( obj ).offset( ).left / scaleFactor;
-                            var yBase = $( obj ).offset( ).top / scaleFactor;
-                            $( obj ).attr( "lbase" , xBase ).attr( "tbase" , yBase ).css(
-                                {
-                                    "z-index": "1",
-                                    "opacity": "1"
-                                }
-                            );
-                            
-                            if( $( obj ).hasClass( "room" ) )
-                            {
-                                thisIndex = $( "div#objectLayer div#objects div.object.room" ).index( obj );
-                                rooms[ activeLayer ][ thisIndex ].position = [ xBase, yBase ];
-                            }
-                            
-                            redrawLines( );
-                            $( window ).off( "mousemove" ).off( "mouseup" );
-                            
-                            event3.preventDefault();
-                            event3.stopPropagation();
-                            return false;
-                        }
-                    );
-                }, holdDelay);
-                $( obj ).css(
-                    {
-                    "z-index": "2",
-                    "opacity": "0.5"
-                    }
-                );
-                event.stopPropagation( );
-                event.preventDefault( );
-                return false;
-            }
-        );
-        $( clickable ).on(
-            "mouseup",
-            function( )
-            {
-                $( obj ).css(
-                    {
-                        "z-index": "1",
-                        "opacity": "1"
-                    }
-                );
-                if ( holdStarter ) 
-                {
-                    clearTimeout(holdStarter);
-                }
-                else if ( holdActive )
-                {
-                    holdActive = false;
-                }
-            }
-        );
-    },
-    scaleInPlace: function( base )
-    {
-        var obj = this;
-        $( window ).on(
-            "mousewheel",
-            function( event )
-            {
-                var startLeft = $( obj ).attr( "lbase" );
-                var startTop = $( obj ).attr( "tbase" );
-                $( obj ).css(
-                    {
-                        "width": base[0] * scaleFactor + "px",
-                        "height" : base[1] * scaleFactor + "px",
-                        "left" : startLeft * scaleFactor + "px",
-                        "top" : startTop * scaleFactor + "px"
-                    }
-                ).find ( "div.body" ).css(
-                    {
-                        "width": base[0] * scaleFactor + "px",
-                        "height" : ( base[1] - 40 ) * scaleFactor + "px"
-                    }
-                );
-                redrawLines( );
-            }
-        );
-    },
-    grabSlide: function( )
-    {
-        var obj = this;
-        buildString = function( vars )
+        bounceFade: function( callback )
         {
-            var retVal = "";
-            for( var i = 0; i < vars.length; i++ )
-            {
-                for( var j = 0; j < vars[i].length; j++ )
+            callback = callback || function( ){};
+            $( this ).stop( ).fadeIn(100).delay(300).fadeOut(500, callback);
+        },
+        grabMove: function( )
+        {
+            var clickable = this;
+            var snapToleranceX = 50;
+            var snapToleranceY = 50;
+            var obj = $( this ).parent( ).parent( );
+            $( clickable ).on(
+                "mousedown",
+                function( event )
                 {
-                    retVal += vars[i][j] + "px ";
-                }
-                retVal = retVal.substring( 0, retVal.length-1 ) + ",";
-            }
-            return retVal.substring( 0, retVal.length-1 )
-        };
-        $( obj ).on(
-            "mousedown",
-            function( event )
-            {
-                holdStarter = setTimeout(
-                    function( ) 
-                    {
+                    holdStarter = setTimeout(function() {
                         holdStarter = null;
                         holdActive = true;
-                        objStart = $( obj ).css( "background-position" ).trim( ).split(",");
-                        var objNew = [[],[],[],[]];
-                        for( var i = 0; i < objStart.length; i++ )
-                        {
-                            var split = objStart[i].trim().split(" ");
-                            for( var j = 0; j < split.length; j ++ )
-                            {
-                                split[j] = parseInt( split[j] );
-                            }
-                            objStart[i] = split;
-                        }   
-                        var cursorStart = [ event.pageX, event.pageY ];  
+                        var objStart = [ $( obj ).offset( ).left, $( obj ).offset( ).top ];
+                        var cursorStart = [ event.pageX, event.pageY ];
                         $( window ).on(
                             "mousemove",
                             function( event2 )
                             {
                                 var delta = [ event2.pageX, event2.pageY ];
+                                var newLeft = (objStart[0]-(cursorStart[0]-delta[0]));
+                                var newTop = (objStart[1]-(cursorStart[1]-delta[1]));
+                                var allObjects = $( obj ).siblings( );
                                 
-                                for( var i = 0; i < objStart.length; i++ )
+                                for( var i = 0 ; i < allObjects.length; i ++ )
                                 {
-                                    objNew[i][0] = objStart[i][0] - ( cursorStart[0] - delta[0] );
-                                    objNew[i][1] = objStart[i][1] - ( cursorStart[1] - delta[1] );
+                                    if ( Math.abs( newLeft - parseFloat( $( allObjects[i] ).css( "left" ) ) ) <= snapToleranceX )
+                                    {
+                                        newLeft = parseFloat( $( allObjects[i] ).css( "left" ) );
+                                    }
+                                     if ( Math.abs( newTop - parseFloat( $( allObjects[i] ).css( "top" ) ) ) <= snapToleranceY )
+                                    {
+                                        newTop = parseFloat( $( allObjects[i] ).css( "top" ) );
+                                    }
                                 }
+                                
                                 $( obj ).css( 
                                     {
-                                        "background-position": buildString( objNew )
+                                        "left": newLeft+"px",
+                                        "top":  newTop+"px"
                                     }
                                 );
-                                $( obj ).find( "div#objects > div.object" ).each(
-                                    function( )
-                                    {
-                                        var startLeft = $( this ).attr( "lbase" ) * scaleFactor;
-                                        var startTop = $( this ).attr( "tbase" ) * scaleFactor;
-                                        $( this ).css(
-                                            {
-                                                "left": startLeft - ( cursorStart[0] - delta[0] ),
-                                                "top":  startTop - ( cursorStart[1] - delta[1] )
-                                            }
-                                        );
-                                    }
-                                );
-                                $( obj ).find( "div#decorations > div.line" ).each(
-                                    function( )
-                                    {
-                                        var startLeft = $( this ).attr( "lbase" );
-                                        var startTop = $( this ).attr( "tbase" );
-                                        $( this ).css(
-                                            {
-                                                "left": startLeft - ( cursorStart[0] - delta[0] ),
-                                                "top": startTop - ( cursorStart[1] - delta[1] )
-                                            }
-                                        );
-                                    }
-                                );
+                                redrawLines( );
                                 event2.preventDefault();
                                 event2.stopPropagation();
                                 return false;
@@ -334,54 +165,226 @@ $.fn.extend({
                             "mouseup",
                             function( event3 )
                             {
+                                var xBase = $( obj ).offset( ).left / scaleFactor;
+                                var yBase = $( obj ).offset( ).top / scaleFactor;
+                                $( obj ).attr( "lbase" , xBase ).attr( "tbase" , yBase ).css(
+                                    {
+                                        "z-index": "1",
+                                        "opacity": "1"
+                                    }
+                                );
+                                
+                                if( $( obj ).hasClass( "room" ) )
+                                {
+                                    thisIndex = $( "div#objectLayer div#objects div.object.room" ).index( obj );
+                                    rooms[ activeLayer ][ thisIndex ].position = [ xBase, yBase ];
+                                }
+                                
+                                redrawLines( );
                                 $( window ).off( "mousemove" ).off( "mouseup" );
-                                $( obj ).find( "div#objects > div.object" ).each(
-                                    function( )
-                                    {
-                                        var xBase = $( this ).offset( ).left / scaleFactor;
-                                        var yBase = $( this ).offset( ).top / scaleFactor;
-                                        $( this ).attr( "lbase", xBase ).attr( "tbase", yBase );
-                                        if( $( this ).hasClass( "room" ) )
-                                        {
-                                            thisIndex = $( "div#objectLayer div#objects div.object.room" ).index( this );
-                                            rooms[ activeLayer ][ thisIndex ].position = [ xBase, yBase ];
-                                        }
-                                    }
-                                );
-                                $( obj ).find( "div#decorations > div.line" ).each(
-                                    function( )
-                                    {
-                                        $( this ).attr( "lbase", parseFloat( $( this ).css( "left" ) ) ).attr( "tbase", parseFloat( $( this ).css( "top" ) ) );
-                                    }
-                                );
+                                
                                 event3.preventDefault();
                                 event3.stopPropagation();
                                 return false;
                             }
                         );
-                    }, 
-                holdDelay);
-                event.preventDefault();
-                event.stopPropagation();
-                return false;
-            }
-        );
-        $( obj ).on(
-            "mouseup",
-            function( )
+                    }, holdDelay);
+                    $( obj ).css(
+                        {
+                        "z-index": "2",
+                        "opacity": "0.5"
+                        }
+                    );
+                    event.stopPropagation( );
+                    event.preventDefault( );
+                    return false;
+                }
+            );
+            $( clickable ).on(
+                "mouseup",
+                function( )
+                {
+                    $( obj ).css(
+                        {
+                            "z-index": "1",
+                            "opacity": "1"
+                        }
+                    );
+                    if ( holdStarter ) 
+                    {
+                        clearTimeout(holdStarter);
+                    }
+                    else if ( holdActive )
+                    {
+                        holdActive = false;
+                    }
+                }
+            );
+        },
+        scaleInPlace: function( base )
+        {
+            var obj = this;
+            $( window ).on(
+                "mousewheel",
+                function( event )
+                {
+                    var startLeft = $( obj ).attr( "lbase" );
+                    var startTop = $( obj ).attr( "tbase" );
+                    $( obj ).css(
+                        {
+                            "width": base[0] * scaleFactor + "px",
+                            "height" : base[1] * scaleFactor + "px",
+                            "left" : startLeft * scaleFactor + "px",
+                            "top" : startTop * scaleFactor + "px"
+                        }
+                    ).find ( "div.body" ).css(
+                        {
+                            "width": base[0] * scaleFactor + "px",
+                            "height" : ( base[1] - 40 ) * scaleFactor + "px"
+                        }
+                    );
+                    redrawLines( );
+                }
+            );
+        },
+        grabSlide: function( )
+        {
+            var obj = this;
+            buildString = function( vars )
             {
-                if ( holdStarter ) 
+                var retVal = "";
+                for( var i = 0; i < vars.length; i++ )
                 {
-                    clearTimeout(holdStarter);
+                    for( var j = 0; j < vars[i].length; j++ )
+                    {
+                        retVal += vars[i][j] + "px ";
+                    }
+                    retVal = retVal.substring( 0, retVal.length-1 ) + ",";
                 }
-                else if ( holdActive )
+                return retVal.substring( 0, retVal.length-1 )
+            };
+            $( obj ).on(
+                "mousedown",
+                function( event )
                 {
-                    holdActive = false;
+                    holdStarter = setTimeout(
+                        function( ) 
+                        {
+                            holdStarter = null;
+                            holdActive = true;
+                            objStart = $( obj ).css( "background-position" ).trim( ).split(",");
+                            var objNew = [[],[],[],[]];
+                            for( var i = 0; i < objStart.length; i++ )
+                            {
+                                var split = objStart[i].trim().split(" ");
+                                for( var j = 0; j < split.length; j ++ )
+                                {
+                                    split[j] = parseInt( split[j] );
+                                }
+                                objStart[i] = split;
+                            }   
+                            var cursorStart = [ event.pageX, event.pageY ];  
+                            $( window ).on(
+                                "mousemove",
+                                function( event2 )
+                                {
+                                    var delta = [ event2.pageX, event2.pageY ];
+                                    
+                                    for( var i = 0; i < objStart.length; i++ )
+                                    {
+                                        objNew[i][0] = objStart[i][0] - ( cursorStart[0] - delta[0] );
+                                        objNew[i][1] = objStart[i][1] - ( cursorStart[1] - delta[1] );
+                                    }
+                                    $( obj ).css( 
+                                        {
+                                            "background-position": buildString( objNew )
+                                        }
+                                    );
+                                    $( obj ).find( "div#objects > div.object" ).each(
+                                        function( )
+                                        {
+                                            var startLeft = $( this ).attr( "lbase" ) * scaleFactor;
+                                            var startTop = $( this ).attr( "tbase" ) * scaleFactor;
+                                            $( this ).css(
+                                                {
+                                                    "left": startLeft - ( cursorStart[0] - delta[0] ),
+                                                    "top":  startTop - ( cursorStart[1] - delta[1] )
+                                                }
+                                            );
+                                        }
+                                    );
+                                    $( obj ).find( "div#decorations > div.line" ).each(
+                                        function( )
+                                        {
+                                            var startLeft = $( this ).attr( "lbase" );
+                                            var startTop = $( this ).attr( "tbase" );
+                                            $( this ).css(
+                                                {
+                                                    "left": startLeft - ( cursorStart[0] - delta[0] ),
+                                                    "top": startTop - ( cursorStart[1] - delta[1] )
+                                                }
+                                            );
+                                        }
+                                    );
+                                    event2.preventDefault();
+                                    event2.stopPropagation();
+                                    return false;
+                                }
+                            );
+                            $( window ).on(
+                                "mouseup",
+                                function( event3 )
+                                {
+                                    $( window ).off( "mousemove" ).off( "mouseup" );
+                                    $( obj ).find( "div#objects > div.object" ).each(
+                                        function( )
+                                        {
+                                            var xBase = $( this ).offset( ).left / scaleFactor;
+                                            var yBase = $( this ).offset( ).top / scaleFactor;
+                                            $( this ).attr( "lbase", xBase ).attr( "tbase", yBase );
+                                            if( $( this ).hasClass( "room" ) )
+                                            {
+                                                thisIndex = $( "div#objectLayer div#objects div.object.room" ).index( this );
+                                                rooms[ activeLayer ][ thisIndex ].position = [ xBase, yBase ];
+                                            }
+                                        }
+                                    );
+                                    $( obj ).find( "div#decorations > div.line" ).each(
+                                        function( )
+                                        {
+                                            $( this ).attr( "lbase", parseFloat( $( this ).css( "left" ) ) ).attr( "tbase", parseFloat( $( this ).css( "top" ) ) );
+                                        }
+                                    );
+                                    event3.preventDefault();
+                                    event3.stopPropagation();
+                                    return false;
+                                }
+                            );
+                        }, 
+                    holdDelay);
+                    event.preventDefault();
+                    event.stopPropagation();
+                    return false;
                 }
-            }
-        );
+            );
+            $( obj ).on(
+                "mouseup",
+                function( )
+                {
+                    if ( holdStarter ) 
+                    {
+                        clearTimeout(holdStarter);
+                    }
+                    else if ( holdActive )
+                    {
+                        holdActive = false;
+                    }
+                }
+            );
+        }
     }
-});
+);
+
 function scaleGrid( up , base )
 {
     var sizes = $( "div#objectLayer" ).css( "background-size" ).split(",");
@@ -1120,7 +1123,7 @@ mouseEvents[ "rooms.connection" ] = function( )
                 );
             }
         );
-        $( "div#objectLayer div#objects div.object div.handles div.link"  ).on(
+        $( "div#objectLayer > div#objects > div.object > div.handles div.link"  ).on(
             "click",
             function( event )
             {
@@ -1133,7 +1136,7 @@ mouseEvents[ "rooms.connection" ] = function( )
                 
                 var thisLink = this;
                 
-                var firstIndex = $( "div#objectLayer div#objects div.object" ).index( $( this ).parent( ).parent( ) );
+                var firstIndex = $( "div#objectLayer > div#objects > div.object" ).index( $( this ).parent( ).parent( ) );
                 
                 if( $( this ).hasClass( "northLink" ) )
                 {
@@ -1201,13 +1204,13 @@ mouseEvents[ "rooms.connection" ] = function( )
                     {
                         line.remove( );
                         $( window ).off( "mousemove" );
-                        $( "div#objectLayer div#objects div.object div.handles div.link"  ).off( "click" );
+                        $( "div#objectLayer > div#objects > div.object > div.handles div.link"  ).off( "click" );
                         event2.preventDefault( );
                         event2.stopPropagation( );
                         bindMouse( );
                     }
                 );
-                $( "div#objectLayer div#objects div.object div.handles div.link"  ).off( "click" ).on(
+                $( "div#objectLayer > div#objects > div.object > div.handles div.link"  ).off( "click" ).on(
                     "click",
                     function( event2 )
                     {
@@ -1220,7 +1223,7 @@ mouseEvents[ "rooms.connection" ] = function( )
                         x2 = $( this ).offset( ).left;
                         y2 = $( this ).offset( ).top;
                         
-                        var secondIndex = $( "div#objectLayer div#objects div.object" ).index( $( this ).parent( ).parent( ) );
+                        var secondIndex = $( "div#objectLayer > div#objects > div.object" ).index( $( this ).parent( ).parent( ) );
                         
                         if( $( this ).hasClass( "northLink" ) )
                         {
@@ -1249,7 +1252,7 @@ mouseEvents[ "rooms.connection" ] = function( )
                         if( rooms[ activeLayer ][ secondIndex ].connections[ secondLink ] !== null )
                         {
                             rooms[ activeLayer ][ secondIndex ].connections[ secondLink ] = null;
-                            $( "div#objectLayer div#decorations div.line" ).each(
+                            $( "div#objectLayer > div#decorations > div.line" ).each(
                                 function( )
                                 {
                                     if( $( this ).attr( "id1" ) == secondIndex + ":" + secondLink )
@@ -1281,7 +1284,7 @@ mouseEvents[ "rooms.connection" ] = function( )
                         );
                         event2.preventDefault( );
                         event2.stopPropagation( );
-                        $( "div#objectLayer div#objects div.object div.handles div.link"  ).off( "click" );
+                        $( "div#objectLayer > div#objects > div.object > div.handles div.link"  ).off( "click" );
                         bindMouse( );
                     }
                 );
@@ -1321,7 +1324,11 @@ mouseEvents[ "rooms.description" ] = function( )
                 var thisIndex = $( "div#objectLayer > div#objects > div.room.object" ).index( this );
                 var thisRoom = rooms[ activeLayer ][ thisIndex ];
                 
-                var string = "<h2>" + thisRoom.name + "</h2><div class=\"optionsBox\"><h4>Name:</h4><input type=\"text\" id=\"name\" value=\"" + thisRoom.name + "\" /><h4>Description:</h4><textarea>" + thisRoom.description+ "</textarea></div>";
+                var string = "<h2>" + thisRoom.name + "</h2><div class=\"optionsBox\"><h4>Name:</h4><input type=\"text\" id=\"name\" value=\"" + thisRoom.name + "\" /><h4>Description:</h4><textarea>" + thisRoom.description+ "</textarea><h4>Direction Messages:</h4>";
+                
+                
+                
+                string += "</div>";
                 var newElement = $( string );
                 parameterDisplay( newElement );
                 

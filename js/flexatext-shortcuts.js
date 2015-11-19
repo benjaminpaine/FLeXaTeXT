@@ -122,23 +122,5 @@ $( document ).ready(
                 }
             }
         );
-        /*
-        shortcut( 
-            "m",
-            function( )
-            {
-                $( "div#menuLayer > div#leftMenu > div#contextMenu > div.contextSubMenu#rooms > div.menuItem#move" ).trigger( "click" );
-            },
-            "rooms"
-        );
-        shortcut( 
-            "a",
-            function( )
-            {
-                $( "div#menuLayer > div#leftMenu > div#contextMenu > div.contextSubMenu#rooms > div.menuItem#add" ).trigger( "click" );
-            },
-            "rooms"
-        );
-        */
     }
 );

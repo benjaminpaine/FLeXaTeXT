@@ -8,36 +8,64 @@ $( document ).ready(
             function( )
             {
                 var tip = $( this ).attr( "tooltip" );
-                var obj = this;
                 if( tip !== undefined )
                 {
-                    $( this ).on(
-                        "mouseenter",
-                        function( event )
-                        {
-                            tooltipTimer = setTimeout(
-                                function( )
-                                {
-                                    $( "div#toolTip" ).css(
-                                        {
-                                            "left" : $( obj ).offset( ).left + $( obj ).width( ) + 10 + "px",
-                                            "top" : $( obj ).offset( ).top + "px"
-                                        }
-                                    ).html(tip).fadeIn(200);
-                                },500
-                            );
-                        }
-                    );
-                    $( this ).on(
-                        "mouseleave",
-                        function( event )
-                        {
-                            clearTimeout( tooltipTimer );
-                            $( "div#toolTip" ).finish( ).fadeOut( 100 );
-                        }
-                    );
+                    $( this ).toolTip( tip );
                 }
             }
         );
+    }
+);
+
+$.fn.extend(
+    {
+        toolTip: function( message )
+        {
+            var obj = this;
+            $( this ).on(
+                "mouseenter",
+                function( event )
+                {
+                    if( $( obj ).offset( ).left > $( window ).width( ) / 2 )
+                    {
+                        tooltipTimer = setTimeout(
+                            function( )
+                            {
+                                $( "div#toolTip" ).css(
+                                    {
+                                        "left" : "auto",
+                                        "right" : ( $( window ).width( ) - $( obj ).offset( ).left ) + 10 + "px",
+                                        "top" : $( obj ).offset( ).top + "px"
+                                    }
+                                ).html( message ).fadeIn( 200 );
+                            },500
+                        ); 
+                    }
+                    else
+                    {
+                        tooltipTimer = setTimeout(
+                            function( )
+                            {
+                                $( "div#toolTip" ).css(
+                                    {
+                                        "right" : "auto",
+                                        "left" : $( obj ).offset( ).left + $( obj ).width( ) + 10 + "px",
+                                        "top" : $( obj ).offset( ).top + "px"
+                                    }
+                                ).html( message ).fadeIn( 200 );
+                            },500
+                        ); 
+                    }
+                }
+            );
+            $( this ).on(
+                "mouseleave",
+                function( event )
+                {
+                    clearTimeout( tooltipTimer );
+                    $( "div#toolTip" ).finish( ).fadeOut( 100 );
+                }
+            );
+        }
     }
 );
