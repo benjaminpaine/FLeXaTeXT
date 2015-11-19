@@ -3,6 +3,7 @@ A visual web application editor and JavaScript engine for text-based adventure g
 
 ## Mission Statement
 This project aims to create a system for developing and deploying text-based adventure games that is:
+
 1. Robust.
 2. Scalable.
 3. Customizable.
